@@ -183,3 +183,4 @@ D:\project API\smartFollowup\smartFollowup.API\bin\Debug\net10.0\sv\Hangfire.Cor
 D:\project API\smartFollowup\smartFollowup.API\bin\Debug\net10.0\tr-TR\Hangfire.Core.resources.dll
 D:\project API\smartFollowup\smartFollowup.API\bin\Debug\net10.0\zh-TW\Hangfire.Core.resources.dll
 D:\project API\smartFollowup\smartFollowup.API\bin\Debug\net10.0\zh\Hangfire.Core.resources.dll
+D:\project API\smartFollowup\smartFollowup.API\obj\Debug\net10.0\smartFollowup.API.sourcelink.json
