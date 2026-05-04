@@ -1,0 +1,125 @@
+﻿using Microsoft.EntityFrameworkCore;
+using SmartFollowUp.API.Data;
+using SmartFollowUp.API.DTOs;
+using SmartFollowUp.API.Models;
+
+namespace SmartFollowUp.API.Services
+{
+    public class AdminService
+    {
+        private readonly AppDbContext _context;
+
+        public AdminService(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        // Get All Doctor Requests
+        public async Task<List<DoctorRequestResponseDto>> GetDoctorRequestsAsync(string? status = null)
+        {
+            var query = _context.DoctorRequests.AsQueryable();
+
+            if (status != null)
+                query = query.Where(r => r.Status == status);
+
+            return await query
+                .Select(r => new DoctorRequestResponseDto
+                {
+                    Id = r.Id,
+                    Name = r.Name,
+                    Email = r.Email,
+                    Specialty = r.Specialty,
+                    LicenseNumber = r.LicenseNumber,
+                    Status = r.Status,
+                    RejectionReason = r.RejectionReason,
+                    CreatedAt = r.CreatedAt
+                })
+                .OrderByDescending(r => r.CreatedAt)
+                .ToListAsync();
+        }
+
+        // Approve Doctor Request
+        public async Task<bool> ApproveDoctorRequestAsync(long requestId, long adminId)
+        {
+            var request = await _context.DoctorRequests
+                .FirstOrDefaultAsync(r => r.Id == requestId && r.Status == "pending");
+
+            if (request == null) return false;
+
+            // Create Doctor Account
+            var user = new User
+            {
+                Name = request.Name,
+                Email = request.Email,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"),
+                Role = "doctor",
+                IsActive = true
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            var doctorProfile = new DoctorProfile
+            {
+                UserId = user.Id,
+                Specialty = request.Specialty,
+                LicenseNumber = request.LicenseNumber
+            };
+
+            _context.DoctorProfiles.Add(doctorProfile);
+
+            request.Status = "approved";
+            request.ReviewedBy = adminId;
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        // Reject Doctor Request
+        public async Task<bool> RejectDoctorRequestAsync(long requestId, long adminId, string reason)
+        {
+            var request = await _context.DoctorRequests
+                .FirstOrDefaultAsync(r => r.Id == requestId && r.Status == "pending");
+
+            if (request == null) return false;
+
+            request.Status = "rejected";
+            request.RejectionReason = reason;
+            request.ReviewedBy = adminId;
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        // Toggle Doctor Active Status
+        public async Task<bool> ToggleDoctorStatusAsync(long doctorId)
+        {
+            var doctor = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == doctorId && u.Role == "doctor");
+
+            if (doctor == null) return false;
+
+            doctor.IsActive = !doctor.IsActive;
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        // Get Analytics
+        public async Task<AnalyticsResponseDto> GetAnalyticsAsync()
+        {
+            return new AnalyticsResponseDto
+            {
+                TotalDoctors = await _context.Users.CountAsync(u => u.Role == "doctor"),
+                TotalPatients = await _context.Users.CountAsync(u => u.Role == "patient"),
+                TotalCases = await _context.Cases.CountAsync(),
+                ActiveCases = await _context.Cases.CountAsync(c => c.Status == "active"),
+                TotalReports = await _context.DailyReports.CountAsync(),
+                CriticalAlerts = await _context.Alerts.CountAsync(a => a.AlertType == "critical" && a.Status == "open"),
+                PendingDoctorRequests = await _context.DoctorRequests.CountAsync(r => r.Status == "pending")
+            };
+        }
+    }
+}

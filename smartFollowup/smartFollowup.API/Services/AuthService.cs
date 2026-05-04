@@ -1,0 +1,217 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using SmartFollowUp.API.Data;
+using SmartFollowUp.API.DTOs;
+using SmartFollowUp.API.Models;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+
+namespace SmartFollowUp.API.Services
+{
+    public class AuthService
+    {
+        private readonly AppDbContext _context;
+        private readonly IConfiguration _configuration;
+        private readonly EmailService _emailService;
+
+        public AuthService(AppDbContext context, IConfiguration configuration, EmailService emailService)
+        {
+            _context = context;
+            _configuration = configuration;
+            _emailService = emailService;
+        }
+
+        // Login
+        public async Task<AuthResponseDto?> LoginAsync(LoginRequestDto request)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == request.Email && u.IsActive);
+
+            if (user == null) return null;
+
+            if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+                return null;
+
+            return new AuthResponseDto
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                Role = user.Role,
+                Token = GenerateToken(user)
+            };
+        }
+
+        // Register Doctor
+        public async Task<AuthResponseDto?> RegisterDoctorAsync(RegisterDoctorRequestDto request)
+        {
+            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+                return null;
+
+            var user = new User
+            {
+                Name = request.Name,
+                Email = request.Email,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                Role = "doctor",
+                Phone = request.Phone,
+                IsActive = true
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            var doctorProfile = new DoctorProfile
+            {
+                UserId = user.Id,
+                Specialty = request.Specialty,
+                LicenseNumber = request.LicenseNumber,
+                Hospital = request.Hospital
+            };
+
+            _context.DoctorProfiles.Add(doctorProfile);
+            await _context.SaveChangesAsync();
+
+            return new AuthResponseDto
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                Role = user.Role,
+                Token = GenerateToken(user)
+            };
+        }
+
+        // Register Patient
+        public async Task<AuthResponseDto?> RegisterPatientAsync(RegisterPatientRequestDto request)
+        {
+            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+                return null;
+
+            var user = new User
+            {
+                Name = request.Name,
+                Email = request.Email,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                Role = "patient",
+                Phone = request.Phone,
+                IsActive = true
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            var patientProfile = new PatientProfile
+            {
+                UserId = user.Id,
+                Age = request.Age,
+                Gender = request.Gender,
+                ChronicDiseases = request.ChronicDiseases,
+                Allergies = request.Allergies,
+                CurrentMedications = request.CurrentMedications
+            };
+
+            _context.PatientProfiles.Add(patientProfile);
+            await _context.SaveChangesAsync();
+
+            return new AuthResponseDto
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                Role = user.Role,
+                Token = GenerateToken(user)
+            };
+        }
+
+        // Submit Doctor Request
+        public async Task<bool> SubmitDoctorRequestAsync(DoctorRequestDto request)
+        {
+            var emailExists = await _context.Users.AnyAsync(u => u.Email == request.Email) ||
+                              await _context.DoctorRequests.AnyAsync(r => r.Email == request.Email);
+
+            if (emailExists) return false;
+
+            var doctorRequest = new DoctorRequest
+            {
+                Name = request.Name,
+                Email = request.Email,
+                Specialty = request.Specialty,
+                LicenseNumber = request.LicenseNumber,
+                Status = "pending",
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.DoctorRequests.Add(doctorRequest);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        // Forgot Password
+        public async Task<bool> ForgotPasswordAsync(string email)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == email);
+
+            if (user == null) return false;
+
+            var resetToken = Guid.NewGuid().ToString("N")[..8].ToUpper();
+            user.ResetToken = resetToken;
+            user.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            await _emailService.SendPasswordResetEmailAsync(
+                user.Email,
+                user.Name,
+                resetToken
+            );
+
+            return true;
+        }
+
+        // Reset Password
+        public async Task<bool> ResetPasswordAsync(ResetPasswordRequestDto request)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == request.Email && u.ResetToken == request.Token);
+
+            if (user == null) return false;
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+            user.ResetToken = null;
+            user.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        // Generate JWT Token
+        private string GenerateToken(User user)
+        {
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
+
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, user.Role)
+            };
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddDays(
+                    int.Parse(_configuration["Jwt:ExpireDays"]!)),
+                signingCredentials: credentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+    }
+}

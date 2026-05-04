@@ -1,0 +1,84 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using SmartFollowUp.API.DTOs;
+using SmartFollowUp.API.Services;
+
+namespace SmartFollowUp.API.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class AuthController : ControllerBase
+    {
+        private readonly AuthService _authService;
+
+        public AuthController(AuthService authService)
+        {
+            _authService = authService;
+        }
+
+        // POST api/auth/login
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginRequestDto request)
+        {
+            var result = await _authService.LoginAsync(request);
+            if (result == null)
+                return Unauthorized(new { message = "Invalid email or password" });
+
+            return Ok(result);
+        }
+
+        // POST api/auth/register-doctor
+        [HttpPost("register-doctor")]
+        public async Task<IActionResult> RegisterDoctor(RegisterDoctorRequestDto request)
+        {
+            var result = await _authService.RegisterDoctorAsync(request);
+            if (result == null)
+                return BadRequest(new { message = "Email already exists" });
+
+            return Ok(result);
+        }
+
+        // POST api/auth/register-patient
+        [HttpPost("register-patient")]
+        public async Task<IActionResult> RegisterPatient(RegisterPatientRequestDto request)
+        {
+            var result = await _authService.RegisterPatientAsync(request);
+            if (result == null)
+                return BadRequest(new { message = "Email already exists" });
+
+            return Ok(result);
+        }
+        // POST api/auth/forgot-password
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordRequestDto request)
+        {
+            var success = await _authService.ForgotPasswordAsync(request.Email);
+            if (!success)
+                return NotFound(new { message = "Email not found" });
+
+            return Ok(new { message = "Reset token sent to your email" });
+        }
+
+        // POST api/auth/reset-password
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordRequestDto request)
+        {
+            var success = await _authService.ResetPasswordAsync(request);
+            if (!success)
+                return BadRequest(new { message = "Invalid token or email" });
+
+            return Ok(new { message = "Password reset successfully" });
+        }
+
+        // POST api/auth/request-doctor
+        [HttpPost("request-doctor")]
+        public async Task<IActionResult> RequestDoctor(DoctorRequestDto request)
+        {
+            var success = await _authService.SubmitDoctorRequestAsync(request);
+            if (!success)
+                return BadRequest(new { message = "Email already exists" });
+
+            return Ok(new { message = "Request submitted successfully, pending admin approval" });
+        }
+
+    }
+}
