@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SmartFollowUp.API.DTOs;
 using SmartFollowUp.API.Services;
+using System.Security.Claims;
 
 namespace SmartFollowUp.API.Controllers
 {
@@ -77,6 +79,16 @@ namespace SmartFollowUp.API.Controllers
                 return Unauthorized(new { message = "Invalid or expired refresh token" });
 
             return Ok(result);
+        }
+
+        // POST api/auth/logout
+        [HttpPost("logout")]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            var userId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            await _authService.LogoutAsync(userId);
+            return Ok(new { message = "Logged out successfully" });
         }
 
     }

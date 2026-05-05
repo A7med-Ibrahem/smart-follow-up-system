@@ -239,5 +239,18 @@ namespace SmartFollowUp.API.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+        // Logout
+        public async Task<bool> LogoutAsync(long userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null) return false;
+
+            user.RefreshToken = null;
+            user.RefreshTokenExpiry = null;
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }
