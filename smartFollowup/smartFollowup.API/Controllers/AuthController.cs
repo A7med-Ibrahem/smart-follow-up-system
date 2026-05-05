@@ -68,5 +68,16 @@ namespace SmartFollowUp.API.Controllers
             return Ok(new { message = "Request submitted successfully, pending admin approval" });
         }
 
+        // POST api/auth/refresh-token
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken(RefreshTokenRequestDto request)
+        {
+            var result = await _authService.RefreshTokenAsync(request.RefreshToken);
+            if (result == null)
+                return Unauthorized(new { message = "Invalid or expired refresh token" });
+
+            return Ok(result);
+        }
+
     }
 }

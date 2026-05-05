@@ -22,7 +22,9 @@ namespace SmartFollowUp.API.Services
             _emailService = emailService;
         }
 
+        // ============================
         // Login
+        // ============================
         public async Task<AuthResponseDto?> LoginAsync(LoginRequestDto request)
         {
             var user = await _context.Users
@@ -33,19 +35,27 @@ namespace SmartFollowUp.API.Services
             if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
                 return null;
 
+            //  Generate Refresh Token
+            var refreshToken = GenerateRefreshToken();
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+            await _context.SaveChangesAsync();
+
             return new AuthResponseDto
             {
                 Id = user.Id,
                 Name = user.Name,
                 Email = user.Email,
                 Role = user.Role,
-                Token = GenerateToken(user)
+                Token = GenerateToken(user),
+                RefreshToken = refreshToken,
+                RefreshTokenExpiry = user.RefreshTokenExpiry.Value
             };
         }
 
-
-
+        // ============================
         // Register Patient
+        // ============================
         public async Task<AuthResponseDto?> RegisterPatientAsync(RegisterPatientRequestDto request)
         {
             if (await _context.Users.AnyAsync(u => u.Email == request.Email))
@@ -77,17 +87,27 @@ namespace SmartFollowUp.API.Services
             _context.PatientProfiles.Add(patientProfile);
             await _context.SaveChangesAsync();
 
+            //  Generate Refresh Token
+            var refreshToken = GenerateRefreshToken();
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+            await _context.SaveChangesAsync();
+
             return new AuthResponseDto
             {
                 Id = user.Id,
                 Name = user.Name,
                 Email = user.Email,
                 Role = user.Role,
-                Token = GenerateToken(user)
+                Token = GenerateToken(user),
+                RefreshToken = refreshToken,
+                RefreshTokenExpiry = user.RefreshTokenExpiry.Value
             };
         }
 
+        // ============================
         // Submit Doctor Request
+        // ============================
         public async Task<bool> SubmitDoctorRequestAsync(DoctorRequestDto request)
         {
             var emailExists = await _context.Users.AnyAsync(u => u.Email == request.Email) ||
@@ -111,7 +131,9 @@ namespace SmartFollowUp.API.Services
             return true;
         }
 
+        // ============================
         // Forgot Password
+        // ============================
         public async Task<bool> ForgotPasswordAsync(string email)
         {
             var user = await _context.Users
@@ -133,7 +155,9 @@ namespace SmartFollowUp.API.Services
             return true;
         }
 
+        // ============================
         // Reset Password
+        // ============================
         public async Task<bool> ResetPasswordAsync(ResetPasswordRequestDto request)
         {
             var user = await _context.Users
@@ -149,7 +173,48 @@ namespace SmartFollowUp.API.Services
             return true;
         }
 
-        // Generate JWT Token
+        // ============================
+        // Generate Refresh Token
+        // ============================
+        private string GenerateRefreshToken()
+        {
+            var randomBytes = new byte[64];
+            using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
+            rng.GetBytes(randomBytes);
+            return Convert.ToBase64String(randomBytes);
+        }
+
+        // ============================
+        // Refresh Token
+        // ============================
+        public async Task<TokenResponseDto?> RefreshTokenAsync(string refreshToken)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u =>
+                    u.RefreshToken == refreshToken &&
+                    u.RefreshTokenExpiry > DateTime.UtcNow);
+
+            if (user == null) return null;
+
+            var newAccessToken = GenerateToken(user);
+            var newRefreshToken = GenerateRefreshToken();
+
+            user.RefreshToken = newRefreshToken;
+            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+
+            await _context.SaveChangesAsync();
+
+            return new TokenResponseDto
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken,
+                RefreshTokenExpiry = user.RefreshTokenExpiry.Value
+            };
+        }
+
+        // ============================
+        // Generate JWT Token (UPDATED)
+        // ============================
         private string GenerateToken(User user)
         {
             var key = new SymmetricSecurityKey(
@@ -168,8 +233,7 @@ namespace SmartFollowUp.API.Services
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddDays(
-                    int.Parse(_configuration["Jwt:ExpireDays"]!)),
+                expires: DateTime.UtcNow.AddMinutes(15), 
                 signingCredentials: credentials
             );
 

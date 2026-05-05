@@ -148,6 +148,22 @@
   },
   {
     "ContainingType": "SmartFollowUp.API.Controllers.AuthController",
+    "Method": "RefreshToken",
+    "RelativePath": "api/Auth/refresh-token",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "RefreshTokenRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SmartFollowUp.API.Controllers.AuthController",
     "Method": "RegisterPatient",
     "RelativePath": "api/Auth/register-patient",
     "HttpMethod": "POST",
