@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using SmartFollowUp.API.Data;
 using SmartFollowUp.API.DTOs;
+using SmartFollowUp.API.Hubs;
 using SmartFollowUp.API.Models;
 
 namespace SmartFollowUp.API.Services
@@ -8,10 +10,43 @@ namespace SmartFollowUp.API.Services
     public class NotificationService
     {
         private readonly AppDbContext _context;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
-        public NotificationService(AppDbContext context)
+        public NotificationService(AppDbContext context, IHubContext<NotificationHub> hubContext)
         {
             _context = context;
+            _hubContext = hubContext;
+        }
+
+        // Send Notification
+        public async Task SendNotificationAsync(long userId, string type, string title, string body, long? alertId = null)
+        {
+            var notification = new Notification
+            {
+                UserId = userId,
+                AlertId = alertId,
+                Type = type,
+                Title = title,
+                Body = body,
+                IsRead = false,
+                SentAt = DateTime.UtcNow
+            };
+
+            _context.Notifications.Add(notification);
+            await _context.SaveChangesAsync();
+
+            // بعت Real-time للـ User فوراً
+            await _hubContext.Clients
+                .Group($"user_{userId}")
+                .SendAsync("ReceiveNotification", new
+                {
+                    notification.Id,
+                    notification.Type,
+                    notification.Title,
+                    notification.Body,
+                    notification.IsRead,
+                    notification.SentAt
+                });
         }
 
         // Get Notifications for User
@@ -56,24 +91,6 @@ namespace SmartFollowUp.API.Services
             foreach (var n in notifications)
                 n.IsRead = true;
 
-            await _context.SaveChangesAsync();
-        }
-
-        // Send Notification
-        public async Task SendNotificationAsync(long userId, string type, string title, string body, long? alertId = null)
-        {
-            var notification = new Notification
-            {
-                UserId = userId,
-                AlertId = alertId,
-                Type = type,
-                Title = title,
-                Body = body,
-                IsRead = false,
-                SentAt = DateTime.UtcNow
-            };
-
-            _context.Notifications.Add(notification);
             await _context.SaveChangesAsync();
         }
 

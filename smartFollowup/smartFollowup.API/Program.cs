@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using SmartFollowUp.API.Data;
 using SmartFollowUp.API.Services;
 using System.Text;
+using SmartFollowUp.API.Hubs;
 
 namespace smartFollowup.API
 {
@@ -27,6 +28,7 @@ namespace smartFollowup.API
             builder.Services.AddScoped<NoteService>();
             builder.Services.AddScoped<AlertService>();
             builder.Services.AddScoped<NotificationService>();
+            builder.Services.AddSignalR();
             builder.Services.AddScoped<WoundImageService>();
             builder.Services.AddScoped<AdminService>();
             builder.Services.AddScoped<PatientService>();
@@ -108,6 +110,7 @@ namespace smartFollowup.API
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
+            app.MapHub<NotificationHub>("/hubs/notifications");
 
             // Hangfire
             app.UseHangfireDashboard("/hangfire", new DashboardOptions
