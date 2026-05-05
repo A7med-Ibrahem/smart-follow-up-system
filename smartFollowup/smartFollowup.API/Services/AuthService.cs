@@ -43,45 +43,7 @@ namespace SmartFollowUp.API.Services
             };
         }
 
-        // Register Doctor
-        public async Task<AuthResponseDto?> RegisterDoctorAsync(RegisterDoctorRequestDto request)
-        {
-            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
-                return null;
 
-            var user = new User
-            {
-                Name = request.Name,
-                Email = request.Email,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-                Role = "doctor",
-                Phone = request.Phone,
-                IsActive = true
-            };
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            var doctorProfile = new DoctorProfile
-            {
-                UserId = user.Id,
-                Specialty = request.Specialty,
-                LicenseNumber = request.LicenseNumber,
-                Hospital = request.Hospital
-            };
-
-            _context.DoctorProfiles.Add(doctorProfile);
-            await _context.SaveChangesAsync();
-
-            return new AuthResponseDto
-            {
-                Id = user.Id,
-                Name = user.Name,
-                Email = user.Email,
-                Role = user.Role,
-                Token = GenerateToken(user)
-            };
-        }
 
         // Register Patient
         public async Task<AuthResponseDto?> RegisterPatientAsync(RegisterPatientRequestDto request)

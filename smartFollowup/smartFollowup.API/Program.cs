@@ -110,7 +110,13 @@ namespace smartFollowup.API
             app.MapControllers();
 
             // Hangfire
-            app.UseHangfireDashboard("/hangfire");
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                Authorization = new[]
+    {
+        new Hangfire.Dashboard.LocalRequestsOnlyAuthorizationFilter()
+    }
+            });
             RecurringJob.AddOrUpdate<EscalationService>(
                 "emergency-escalation",
                 x => x.CheckAndEscalateAsync(),

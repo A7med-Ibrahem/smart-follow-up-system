@@ -25,18 +25,6 @@ namespace SmartFollowUp.API.Controllers
 
             return Ok(result);
         }
-
-        // POST api/auth/register-doctor
-        [HttpPost("register-doctor")]
-        public async Task<IActionResult> RegisterDoctor(RegisterDoctorRequestDto request)
-        {
-            var result = await _authService.RegisterDoctorAsync(request);
-            if (result == null)
-                return BadRequest(new { message = "Email already exists" });
-
-            return Ok(result);
-        }
-
         // POST api/auth/register-patient
         [HttpPost("register-patient")]
         public async Task<IActionResult> RegisterPatient(RegisterPatientRequestDto request)
