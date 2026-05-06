@@ -7,6 +7,8 @@ using SmartFollowUp.API.Data;
 using SmartFollowUp.API.Services;
 using System.Text;
 using SmartFollowUp.API.Hubs;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 
 namespace smartFollowup.API
 {
@@ -36,6 +38,41 @@ namespace smartFollowup.API
             builder.Services.AddScoped<EscalationService>();
             builder.Services.AddScoped<AuditService>();
             builder.Services.AddScoped<DoctorService>();
+
+
+
+            // Rate Limiting
+            builder.Services.AddRateLimiter(options =>
+            {
+                // Login — 5 محاولات كل دقيقة
+                options.AddFixedWindowLimiter("login", opt =>
+                {
+                    opt.PermitLimit = 5;
+                    opt.Window = TimeSpan.FromMinutes(1);
+                    opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                    opt.QueueLimit = 0;
+                });
+
+                // API عام — 100 request كل دقيقة
+                options.AddFixedWindowLimiter("api", opt =>
+                {
+                    opt.PermitLimit = 100;
+                    opt.Window = TimeSpan.FromMinutes(1);
+                    opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                    opt.QueueLimit = 0;
+                });
+
+                // Upload — 10 uploads كل دقيقة
+                options.AddFixedWindowLimiter("upload", opt =>
+                {
+                    opt.PermitLimit = 10;
+                    opt.Window = TimeSpan.FromMinutes(1);
+                    opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                    opt.QueueLimit = 0;
+                });
+
+                options.RejectionStatusCode = 429;
+            });
 
             // Hangfire
             builder.Services.AddHangfire(x => x.UseSqlServerStorage(
@@ -109,6 +146,7 @@ namespace smartFollowup.API
 
             app.UseHttpsRedirection();
             app.UseCors("AllowAll");
+            app.UseRateLimiter();
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();

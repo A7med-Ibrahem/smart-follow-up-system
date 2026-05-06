@@ -8,10 +8,12 @@ namespace SmartFollowUp.API.Services
     public class AdminService
     {
         private readonly AppDbContext _context;
+        private readonly EmailService _emailService;
 
-        public AdminService(AppDbContext context)
+        public AdminService(AppDbContext context, EmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         // Get All Doctor Requests
@@ -72,6 +74,21 @@ namespace SmartFollowUp.API.Services
             request.ReviewedBy = adminId;
 
             await _context.SaveChangesAsync();
+            // بعت Email للدكتور
+            await _emailService.SendEmailAsync(
+                request.Email,
+                request.Name,
+                "Smart Follow Up — Account Approved ✅",
+                $@"
+                <h2>Congratulations, {request.Name}!</h2>
+                <p>Your doctor account has been approved.</p>
+                <p><strong>Email:</strong> {request.Email}</p>
+                <p><strong>Temporary Password:</strong> Smart@123</p>
+                <p>Please login and change your password.</p>
+                <br>
+                <p>Smart Follow Up Team</p>
+                "
+            );
 
             return true;
         }

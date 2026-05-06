@@ -8,22 +8,22 @@ namespace SmartFollowUp.API.Services
     public class ReportService
     {
         private readonly AppDbContext _context;
+        private readonly NotificationService _notificationService;
 
-        public ReportService(AppDbContext context)
+        public ReportService(AppDbContext context, NotificationService notificationService)
         {
             _context = context;
+            _notificationService = notificationService;
         }
 
         // Submit Daily Report
         public async Task<ReportResponseDto?> CreateReportAsync(CreateReportRequestDto request, long patientId)
         {
-            // تأكد إن الـ Case موجودة وتابعة للمريض
             var existingCase = await _context.Cases
                 .FirstOrDefaultAsync(c => c.Id == request.CaseId && c.PatientId == patientId);
 
             if (existingCase == null) return null;
 
-            // عمل التقرير
             var report = new DailyReport
             {
                 CaseId = request.CaseId,
@@ -73,6 +73,25 @@ namespace SmartFollowUp.API.Services
             }
 
             await _context.SaveChangesAsync();
+
+            // بعت Notification للمريض
+            await _notificationService.SendNotificationAsync(
+                patientId,
+                "reminder",
+                "Report Submitted ✅",
+                $"Your daily report has been received. Risk Level: {riskLevel}"
+            );
+
+            // لو Critical — بعت Notification للدكتور
+            if (riskLevel == "critical")
+            {
+                await _notificationService.SendNotificationAsync(
+                    existingCase.DoctorId,
+                    "alert",
+                    "🚨 Critical Patient Alert",
+                    "Patient report shows critical condition. Immediate attention required!"
+                );
+            }
 
             return new ReportResponseDto
             {
@@ -142,18 +161,13 @@ namespace SmartFollowUp.API.Services
         {
             decimal score = 0;
 
-            // Temperature
             if (request.Temperature >= 39) score += 30;
             else if (request.Temperature >= 38) score += 15;
 
-            // Pain Level
             if (request.PainLevel >= 8) score += 30;
             else if (request.PainLevel >= 5) score += 15;
 
-            // Swelling
             if (request.Swelling) score += 20;
-
-            // Bleeding
             if (request.Bleeding) score += 20;
 
             return Math.Min(score, 100);

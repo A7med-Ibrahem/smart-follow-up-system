@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SmartFollowUp.API.DTOs;
 using SmartFollowUp.API.Services;
 using System.Security.Claims;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace SmartFollowUp.API.Controllers
 {
@@ -19,6 +20,7 @@ namespace SmartFollowUp.API.Controllers
 
         // POST api/auth/login
         [HttpPost("login")]
+        [EnableRateLimiting("login")]
         public async Task<IActionResult> Login(LoginRequestDto request)
         {
             var result = await _authService.LoginAsync(request);

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SmartFollowUp.API.Services;
 using System.Security.Claims;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace SmartFollowUp.API.Controllers
 {
@@ -20,6 +21,7 @@ namespace SmartFollowUp.API.Controllers
         // POST api/woundimages/upload/{reportId}
         [HttpPost("upload/{reportId}")]
         [Authorize(Roles = "patient")]
+        [EnableRateLimiting("upload")]
         public async Task<IActionResult> UploadImage(long reportId, IFormFile file)
         {
             var patientId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
