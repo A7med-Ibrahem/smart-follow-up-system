@@ -49,11 +49,18 @@ namespace SmartFollowUp.API.Services
                 });
         }
 
-        // Get Notifications for User
-        public async Task<List<NotificationResponseDto>> GetUserNotificationsAsync(long userId)
+        // Get Notifications for User with Pagination
+        public async Task<PaginatedResponseDto<NotificationResponseDto>> GetUserNotificationsAsync(long userId, PaginationRequestDto pagination)
         {
-            return await _context.Notifications
-                .Where(n => n.UserId == userId)
+            var query = _context.Notifications
+                .Where(n => n.UserId == userId);
+
+            var totalCount = await query.CountAsync();
+
+            var data = await query
+                .OrderByDescending(n => n.SentAt)
+                .Skip((pagination.Page - 1) * pagination.PageSize)
+                .Take(pagination.PageSize)
                 .Select(n => new NotificationResponseDto
                 {
                     Id = n.Id,
@@ -63,8 +70,18 @@ namespace SmartFollowUp.API.Services
                     IsRead = n.IsRead,
                     SentAt = n.SentAt
                 })
-                .OrderByDescending(n => n.SentAt)
                 .ToListAsync();
+
+            return new PaginatedResponseDto<NotificationResponseDto>
+            {
+                Data = data,
+                CurrentPage = pagination.Page,
+                PageSize = pagination.PageSize,
+                TotalCount = totalCount,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)pagination.PageSize),
+                HasNextPage = pagination.Page * pagination.PageSize < totalCount,
+                HasPreviousPage = pagination.Page > 1
+            };
         }
 
         // Mark as Read

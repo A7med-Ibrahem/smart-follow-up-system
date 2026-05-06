@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SmartFollowUp.API.DTOs;
 using SmartFollowUp.API.Services;
 using System.Security.Claims;
 
@@ -17,12 +18,12 @@ namespace SmartFollowUp.API.Controllers
             _notificationService = notificationService;
         }
 
-        // GET api/notifications
+        // GET api/notifications?page=1&pageSize=10
         [HttpGet]
-        public async Task<IActionResult> GetMyNotifications()
+        public async Task<IActionResult> GetMyNotifications([FromQuery] PaginationRequestDto pagination)
         {
             var userId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-            var result = await _notificationService.GetUserNotificationsAsync(userId);
+            var result = await _notificationService.GetUserNotificationsAsync(userId, pagination);
             return Ok(result);
         }
 

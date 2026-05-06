@@ -3,6 +3,34 @@
   "WorkspaceRootPath": "D:\\project API\\smartFollowup\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|d:\\project api\\smartfollowup\\smartfollowup.api\\controllers\\notificationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|solutionrelative:smartfollowup.api\\controllers\\notificationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|d:\\project api\\smartfollowup\\smartfollowup.api\\services\\notificationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|solutionrelative:smartfollowup.api\\services\\notificationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|d:\\project api\\smartfollowup\\smartfollowup.api\\controllers\\reportscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|solutionrelative:smartfollowup.api\\controllers\\reportscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|d:\\project api\\smartfollowup\\smartfollowup.api\\services\\reportservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|solutionrelative:smartfollowup.api\\services\\reportservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|d:\\project api\\smartfollowup\\smartfollowup.api\\controllers\\casescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|solutionrelative:smartfollowup.api\\controllers\\casescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|d:\\project api\\smartfollowup\\smartfollowup.api\\services\\caseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|solutionrelative:smartfollowup.api\\services\\caseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|d:\\project api\\smartfollowup\\smartfollowup.api\\dtos\\paginationdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|solutionrelative:smartfollowup.api\\dtos\\paginationdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|d:\\project api\\smartfollowup\\smartfollowup.api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|solutionrelative:smartfollowup.api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -11,20 +39,12 @@
       "RelativeMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|solutionrelative:smartfollowup.api\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|d:\\project api\\smartfollowup\\smartfollowup.api\\services\\caseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|solutionrelative:smartfollowup.api\\services\\caseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|d:\\project api\\smartfollowup\\smartfollowup.api\\dtos\\authdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|solutionrelative:smartfollowup.api\\dtos\\authdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|d:\\project api\\smartfollowup\\smartfollowup.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|solutionrelative:smartfollowup.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|d:\\project api\\smartfollowup\\smartfollowup.api\\services\\notificationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|solutionrelative:smartfollowup.api\\services\\notificationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|d:\\project api\\smartfollowup\\smartfollowup.api\\hubs\\notificationhub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -75,10 +95,6 @@
       "RelativeMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|solutionrelative:smartfollowup.api\\services\\prescriptionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|d:\\project api\\smartfollowup\\smartfollowup.api\\controllers\\casescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|solutionrelative:smartfollowup.api\\controllers\\casescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|d:\\project api\\smartfollowup\\smartfollowup.api\\services\\adminservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|solutionrelative:smartfollowup.api\\services\\adminservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -101,10 +117,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|d:\\project api\\smartfollowup\\smartfollowup.api\\dtos\\woundimagedtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|solutionrelative:smartfollowup.api\\dtos\\woundimagedtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|d:\\project api\\smartfollowup\\smartfollowup.api\\controllers\\notificationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|solutionrelative:smartfollowup.api\\controllers\\notificationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|d:\\project api\\smartfollowup\\smartfollowup.api\\dtos\\notificationdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -137,14 +149,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|d:\\project api\\smartfollowup\\smartfollowup.api\\dtos\\prescriptiondtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|solutionrelative:smartfollowup.api\\dtos\\prescriptiondtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|d:\\project api\\smartfollowup\\smartfollowup.api\\controllers\\reportscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|solutionrelative:smartfollowup.api\\controllers\\reportscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|d:\\project api\\smartfollowup\\smartfollowup.api\\services\\reportservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|solutionrelative:smartfollowup.api\\services\\reportservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A7AA0818-F7C2-B57D-9C49-9BC22690A388}|smartFollowup.API\\smartFollowup.API.csproj|d:\\project api\\smartfollowup\\smartfollowup.api\\dtos\\reportdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -222,7 +226,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
@@ -231,19 +235,122 @@
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "AuthDTOs.cs",
-              "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\DTOs\\AuthDTOs.cs",
-              "RelativeDocumentMoniker": "smartFollowup.API\\DTOs\\AuthDTOs.cs",
-              "ToolTip": "D:\\project API\\smartFollowup\\smartFollowup.API\\DTOs\\AuthDTOs.cs*",
-              "RelativeToolTip": "smartFollowup.API\\DTOs\\AuthDTOs.cs*",
-              "ViewState": "AgIAAEIAAAAAAAAAAADwv0oAAAAFAAAAAAAAAA==",
+              "Title": "ReportService.cs",
+              "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Services\\ReportService.cs",
+              "RelativeDocumentMoniker": "smartFollowup.API\\Services\\ReportService.cs",
+              "ToolTip": "D:\\project API\\smartFollowup\\smartFollowup.API\\Services\\ReportService.cs",
+              "RelativeToolTip": "smartFollowup.API\\Services\\ReportService.cs",
+              "ViewState": "AgIAAHcAAAAAAAAAAAAmwIEAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-03T14:27:46.955Z",
+              "WhenOpened": "2026-05-03T16:28:15.597Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ReportsController.cs",
+              "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Controllers\\ReportsController.cs",
+              "RelativeDocumentMoniker": "smartFollowup.API\\Controllers\\ReportsController.cs",
+              "ToolTip": "D:\\project API\\smartFollowup\\smartFollowup.API\\Controllers\\ReportsController.cs",
+              "RelativeToolTip": "smartFollowup.API\\Controllers\\ReportsController.cs",
+              "ViewState": "AgIAABsAAAAAAAAAAAASwCgAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-03T16:35:28.283Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "NotificationService.cs",
+              "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Services\\NotificationService.cs",
+              "RelativeDocumentMoniker": "smartFollowup.API\\Services\\NotificationService.cs",
+              "ToolTip": "D:\\project API\\smartFollowup\\smartFollowup.API\\Services\\NotificationService.cs",
+              "RelativeToolTip": "smartFollowup.API\\Services\\NotificationService.cs",
+              "ViewState": "AgIAAEcAAAAAAAAAAAAmwFQAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-03T17:47:57.59Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "NotificationsController.cs",
+              "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Controllers\\NotificationsController.cs",
+              "RelativeDocumentMoniker": "smartFollowup.API\\Controllers\\NotificationsController.cs",
+              "ToolTip": "D:\\project API\\smartFollowup\\smartFollowup.API\\Controllers\\NotificationsController.cs",
+              "RelativeToolTip": "smartFollowup.API\\Controllers\\NotificationsController.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAA0AAABCAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-03T17:47:43.274Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
+              "Title": "CasesController.cs",
+              "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Controllers\\CasesController.cs",
+              "RelativeDocumentMoniker": "smartFollowup.API\\Controllers\\CasesController.cs",
+              "ToolTip": "D:\\project API\\smartFollowup\\smartFollowup.API\\Controllers\\CasesController.cs",
+              "RelativeToolTip": "smartFollowup.API\\Controllers\\CasesController.cs",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAowCkAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-03T15:34:53.53Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "CaseService.cs",
+              "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Services\\CaseService.cs",
+              "RelativeDocumentMoniker": "smartFollowup.API\\Services\\CaseService.cs",
+              "ToolTip": "D:\\project API\\smartFollowup\\smartFollowup.API\\Services\\CaseService.cs",
+              "RelativeToolTip": "smartFollowup.API\\Services\\CaseService.cs",
+              "ViewState": "AgIAAFoAAAAAAAAAAAAmwG0AAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-03T15:32:29.041Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "PaginationDTOs.cs",
+              "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\DTOs\\PaginationDTOs.cs",
+              "RelativeDocumentMoniker": "smartFollowup.API\\DTOs\\PaginationDTOs.cs",
+              "ToolTip": "D:\\project API\\smartFollowup\\smartFollowup.API\\DTOs\\PaginationDTOs.cs",
+              "RelativeToolTip": "smartFollowup.API\\DTOs\\PaginationDTOs.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAA3wBIAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-06T00:18:11.802Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Controllers\\AuthController.cs",
+              "RelativeDocumentMoniker": "smartFollowup.API\\Controllers\\AuthController.cs",
+              "ToolTip": "D:\\project API\\smartFollowup\\smartFollowup.API\\Controllers\\AuthController.cs",
+              "RelativeToolTip": "smartFollowup.API\\Controllers\\AuthController.cs",
+              "ViewState": "AgIAAFsAAAAAAAAAAAAmwGgAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-03T14:46:10.496Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "AuthService.cs",
+              "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Services\\AuthService.cs",
+              "RelativeDocumentMoniker": "smartFollowup.API\\Services\\AuthService.cs",
+              "ToolTip": "D:\\project API\\smartFollowup\\smartFollowup.API\\Services\\AuthService.cs",
+              "RelativeToolTip": "smartFollowup.API\\Services\\AuthService.cs",
+              "ViewState": "AgIAAAMBAAAAAAAAAAAqwA4BAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-03T14:39:21.426Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Program.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Program.cs",
@@ -255,58 +362,19 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "AuthController.cs",
-              "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Controllers\\AuthController.cs",
-              "RelativeDocumentMoniker": "smartFollowup.API\\Controllers\\AuthController.cs",
-              "ToolTip": "D:\\project API\\smartFollowup\\smartFollowup.API\\Controllers\\AuthController.cs*",
-              "RelativeToolTip": "smartFollowup.API\\Controllers\\AuthController.cs*",
-              "ViewState": "AgIAAFsAAAAAAAAAAAAmwGgAAAAJAAAAAAAAAA==",
+              "DocumentIndex": 9,
+              "Title": "AuthDTOs.cs",
+              "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\DTOs\\AuthDTOs.cs",
+              "RelativeDocumentMoniker": "smartFollowup.API\\DTOs\\AuthDTOs.cs",
+              "ToolTip": "D:\\project API\\smartFollowup\\smartFollowup.API\\DTOs\\AuthDTOs.cs",
+              "RelativeToolTip": "smartFollowup.API\\DTOs\\AuthDTOs.cs",
+              "ViewState": "AgIAAEIAAAAAAAAAAADwv0oAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-03T14:46:10.496Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-03T14:27:46.955Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "CaseService.cs",
-              "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Services\\CaseService.cs",
-              "RelativeDocumentMoniker": "smartFollowup.API\\Services\\CaseService.cs",
-              "ToolTip": "D:\\project API\\smartFollowup\\smartFollowup.API\\Services\\CaseService.cs",
-              "RelativeToolTip": "smartFollowup.API\\Services\\CaseService.cs",
-              "ViewState": "AgIAADAAAAAAAAAAAAAYwDkAAAAXAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-03T15:32:29.041Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "AuthService.cs",
-              "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Services\\AuthService.cs",
-              "RelativeDocumentMoniker": "smartFollowup.API\\Services\\AuthService.cs",
-              "ToolTip": "D:\\project API\\smartFollowup\\smartFollowup.API\\Services\\AuthService.cs*",
-              "RelativeToolTip": "smartFollowup.API\\Services\\AuthService.cs*",
-              "ViewState": "AgIAAAMBAAAAAAAAAAAqwA4BAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-03T14:39:21.426Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "NotificationService.cs",
-              "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Services\\NotificationService.cs",
-              "RelativeDocumentMoniker": "smartFollowup.API\\Services\\NotificationService.cs",
-              "ToolTip": "D:\\project API\\smartFollowup\\smartFollowup.API\\Services\\NotificationService.cs",
-              "RelativeToolTip": "smartFollowup.API\\Services\\NotificationService.cs",
-              "ViewState": "AgIAAFsAAAAAAAAAAAAswGgAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-03T17:47:57.59Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 13,
               "Title": "User.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Models\\User.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Models\\User.cs",
@@ -318,7 +386,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 11,
               "Title": "NotificationHub.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Hubs\\NotificationHub.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Hubs\\NotificationHub.cs",
@@ -330,7 +398,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 52,
+              "DocumentIndex": 53,
               "Title": "20260505224412_AddRefreshToken.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Migrations\\20260505224412_AddRefreshToken.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Migrations\\20260505224412_AddRefreshToken.cs",
@@ -342,7 +410,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 12,
               "Title": "20260503132621_InitialCreate.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Migrations\\20260503132621_InitialCreate.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Migrations\\20260503132621_InitialCreate.cs",
@@ -354,7 +422,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 14,
               "Title": "appsettings.json",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\appsettings.json",
               "RelativeDocumentMoniker": "smartFollowup.API\\appsettings.json",
@@ -366,7 +434,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 15,
               "Title": "EscalationService.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Services\\EscalationService.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Services\\EscalationService.cs",
@@ -378,7 +446,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 16,
               "Title": "gitignore",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\gitignore",
               "RelativeDocumentMoniker": "gitignore",
@@ -390,7 +458,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 17,
               "Title": "PrescriptionsController.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Controllers\\PrescriptionsController.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Controllers\\PrescriptionsController.cs",
@@ -402,7 +470,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 18,
               "Title": "EmailService.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Services\\EmailService.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Services\\EmailService.cs",
@@ -414,7 +482,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 19,
               "Title": "PatientController.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Controllers\\PatientController.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Controllers\\PatientController.cs",
@@ -426,7 +494,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 20,
               "Title": "PatientService.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Services\\PatientService.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Services\\PatientService.cs",
@@ -438,7 +506,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 21,
               "Title": "PatientDTOs.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\DTOs\\PatientDTOs.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\DTOs\\PatientDTOs.cs",
@@ -450,19 +518,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
-              "Title": "CasesController.cs",
-              "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Controllers\\CasesController.cs",
-              "RelativeDocumentMoniker": "smartFollowup.API\\Controllers\\CasesController.cs",
-              "ToolTip": "D:\\project API\\smartFollowup\\smartFollowup.API\\Controllers\\CasesController.cs",
-              "RelativeToolTip": "smartFollowup.API\\Controllers\\CasesController.cs",
-              "ViewState": "AgIAAEAAAAAAAAAAAAAuwE8AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-03T15:34:53.53Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 22,
               "Title": "PrescriptionService.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Services\\PrescriptionService.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Services\\PrescriptionService.cs",
@@ -474,7 +530,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 25,
               "Title": "AdminDTOs.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\DTOs\\AdminDTOs.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\DTOs\\AdminDTOs.cs",
@@ -486,7 +542,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 24,
               "Title": "AdminController.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Controllers\\AdminController.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Controllers\\AdminController.cs",
@@ -498,7 +554,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 23,
               "Title": "AdminService.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Services\\AdminService.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Services\\AdminService.cs",
@@ -510,7 +566,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 26,
               "Title": "WoundImagesController.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Controllers\\WoundImagesController.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Controllers\\WoundImagesController.cs",
@@ -522,7 +578,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 27,
               "Title": "WoundImageService.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Services\\WoundImageService.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Services\\WoundImageService.cs",
@@ -534,7 +590,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
+              "DocumentIndex": 28,
               "Title": "WoundImageDTOs.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\DTOs\\WoundImageDTOs.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\DTOs\\WoundImageDTOs.cs",
@@ -546,19 +602,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 25,
-              "Title": "NotificationsController.cs",
-              "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Controllers\\NotificationsController.cs",
-              "RelativeDocumentMoniker": "smartFollowup.API\\Controllers\\NotificationsController.cs",
-              "ToolTip": "D:\\project API\\smartFollowup\\smartFollowup.API\\Controllers\\NotificationsController.cs",
-              "RelativeToolTip": "smartFollowup.API\\Controllers\\NotificationsController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAADkAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-03T17:47:43.274Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 26,
+              "DocumentIndex": 29,
               "Title": "NotificationDTOs.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\DTOs\\NotificationDTOs.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\DTOs\\NotificationDTOs.cs",
@@ -570,7 +614,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 27,
+              "DocumentIndex": 30,
               "Title": "AlertsController.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Controllers\\AlertsController.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Controllers\\AlertsController.cs",
@@ -582,7 +626,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 28,
+              "DocumentIndex": 31,
               "Title": "AlertService.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Services\\AlertService.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Services\\AlertService.cs",
@@ -594,7 +638,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 29,
+              "DocumentIndex": 32,
               "Title": "AlertDTOs.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\DTOs\\AlertDTOs.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\DTOs\\AlertDTOs.cs",
@@ -606,7 +650,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 30,
+              "DocumentIndex": 33,
               "Title": "NotesController.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Controllers\\NotesController.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Controllers\\NotesController.cs",
@@ -618,7 +662,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 31,
+              "DocumentIndex": 34,
               "Title": "NoteService.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Services\\NoteService.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Services\\NoteService.cs",
@@ -630,7 +674,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 32,
+              "DocumentIndex": 35,
               "Title": "NoteDTOs.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\DTOs\\NoteDTOs.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\DTOs\\NoteDTOs.cs",
@@ -642,7 +686,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 33,
+              "DocumentIndex": 36,
               "Title": "PrescriptionDTOs.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\DTOs\\PrescriptionDTOs.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\DTOs\\PrescriptionDTOs.cs",
@@ -654,31 +698,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 34,
-              "Title": "ReportsController.cs",
-              "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Controllers\\ReportsController.cs",
-              "RelativeDocumentMoniker": "smartFollowup.API\\Controllers\\ReportsController.cs",
-              "ToolTip": "D:\\project API\\smartFollowup\\smartFollowup.API\\Controllers\\ReportsController.cs",
-              "RelativeToolTip": "smartFollowup.API\\Controllers\\ReportsController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACoAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-03T16:35:28.283Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 35,
-              "Title": "ReportService.cs",
-              "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Services\\ReportService.cs",
-              "RelativeDocumentMoniker": "smartFollowup.API\\Services\\ReportService.cs",
-              "ToolTip": "D:\\project API\\smartFollowup\\smartFollowup.API\\Services\\ReportService.cs",
-              "RelativeToolTip": "smartFollowup.API\\Services\\ReportService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAJAAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-03T16:28:15.597Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 36,
+              "DocumentIndex": 37,
               "Title": "ReportDTOs.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\DTOs\\ReportDTOs.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\DTOs\\ReportDTOs.cs",
@@ -690,7 +710,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 37,
+              "DocumentIndex": 38,
               "Title": "CaseDTOs.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\DTOs\\CaseDTOs.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\DTOs\\CaseDTOs.cs",
@@ -702,7 +722,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 38,
+              "DocumentIndex": 39,
               "Title": "AppDbContext.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Data\\AppDbContext.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Data\\AppDbContext.cs",
@@ -714,7 +734,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 39,
+              "DocumentIndex": 40,
               "Title": "WoundImage.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Models\\WoundImage.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Models\\WoundImage.cs",
@@ -726,7 +746,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 40,
+              "DocumentIndex": 41,
               "Title": "PrescriptionMedication.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Models\\PrescriptionMedication.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Models\\PrescriptionMedication.cs",
@@ -738,7 +758,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 41,
+              "DocumentIndex": 42,
               "Title": "Prescription.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Models\\Prescription.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Models\\Prescription.cs",
@@ -750,7 +770,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 42,
+              "DocumentIndex": 43,
               "Title": "PatientProfile.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Models\\PatientProfile.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Models\\PatientProfile.cs",
@@ -762,7 +782,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 43,
+              "DocumentIndex": 44,
               "Title": "Notification.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Models\\Notification.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Models\\Notification.cs",
@@ -774,7 +794,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 44,
+              "DocumentIndex": 45,
               "Title": "MedicationAdherence.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Models\\MedicationAdherence.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Models\\MedicationAdherence.cs",
@@ -786,7 +806,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 45,
+              "DocumentIndex": 46,
               "Title": "DoctorRequest.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Models\\DoctorRequest.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Models\\DoctorRequest.cs",
@@ -798,7 +818,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 46,
+              "DocumentIndex": 47,
               "Title": "DoctorProfile.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Models\\DoctorProfile.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Models\\DoctorProfile.cs",
@@ -810,7 +830,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 47,
+              "DocumentIndex": 48,
               "Title": "DoctorNote.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Models\\DoctorNote.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Models\\DoctorNote.cs",
@@ -822,7 +842,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 48,
+              "DocumentIndex": 49,
               "Title": "DailyReport.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Models\\DailyReport.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Models\\DailyReport.cs",
@@ -834,7 +854,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 49,
+              "DocumentIndex": 50,
               "Title": "Case.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Models\\Case.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Models\\Case.cs",
@@ -846,7 +866,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 50,
+              "DocumentIndex": 51,
               "Title": "Alert.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Models\\Alert.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Models\\Alert.cs",
@@ -858,7 +878,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 51,
+              "DocumentIndex": 52,
               "Title": "AiAnalysis.cs",
               "DocumentMoniker": "D:\\project API\\smartFollowup\\smartFollowup.API\\Models\\AiAnalysis.cs",
               "RelativeDocumentMoniker": "smartFollowup.API\\Models\\AiAnalysis.cs",

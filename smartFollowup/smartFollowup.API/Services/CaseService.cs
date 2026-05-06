@@ -71,12 +71,19 @@ namespace SmartFollowUp.API.Services
             };
         }
 
-        // Get All Cases for Doctor
-        public async Task<List<CaseResponseDto>> GetDoctorCasesAsync(long doctorId)
+        // Get All Cases for Doctor with Pagination
+        public async Task<PaginatedResponseDto<CaseResponseDto>> GetDoctorCasesAsync(long doctorId, PaginationRequestDto pagination)
         {
-            return await _context.Cases
+            var query = _context.Cases
                 .Where(c => c.DoctorId == doctorId)
-                .Include(c => c.Patient)
+                .Include(c => c.Patient);
+
+            var totalCount = await query.CountAsync();
+
+            var data = await query
+                .OrderByDescending(c => c.CreatedAt)
+                .Skip((pagination.Page - 1) * pagination.PageSize)
+                .Take(pagination.PageSize)
                 .Select(c => new CaseResponseDto
                 {
                     Id = c.Id,
@@ -89,6 +96,17 @@ namespace SmartFollowUp.API.Services
                     CreatedAt = c.CreatedAt
                 })
                 .ToListAsync();
+
+            return new PaginatedResponseDto<CaseResponseDto>
+            {
+                Data = data,
+                CurrentPage = pagination.Page,
+                PageSize = pagination.PageSize,
+                TotalCount = totalCount,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)pagination.PageSize),
+                HasNextPage = pagination.Page * pagination.PageSize < totalCount,
+                HasPreviousPage = pagination.Page > 1
+            };
         }
 
         // Get Case by ID

@@ -31,13 +31,13 @@ namespace SmartFollowUp.API.Controllers
             return Ok(result);
         }
 
-        // GET api/cases
+        // GET api/cases?page=1&pageSize=10
         [HttpGet]
         [Authorize(Roles = "doctor")]
-        public async Task<IActionResult> GetDoctorCases()
+        public async Task<IActionResult> GetDoctorCases([FromQuery] PaginationRequestDto pagination)
         {
             var doctorId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-            var result = await _caseService.GetDoctorCasesAsync(doctorId);
+            var result = await _caseService.GetDoctorCasesAsync(doctorId, pagination);
             return Ok(result);
         }
 

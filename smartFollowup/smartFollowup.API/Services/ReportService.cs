@@ -89,12 +89,19 @@ namespace SmartFollowUp.API.Services
             };
         }
 
-        // Get Reports for Case
-        public async Task<List<ReportResponseDto>> GetCaseReportsAsync(long caseId)
+        // Get Reports for Case with Pagination
+        public async Task<PaginatedResponseDto<ReportResponseDto>> GetCaseReportsAsync(long caseId, PaginationRequestDto pagination)
         {
-            return await _context.DailyReports
+            var query = _context.DailyReports
                 .Where(r => r.CaseId == caseId)
-                .Include(r => r.AiAnalysis)
+                .Include(r => r.AiAnalysis);
+
+            var totalCount = await query.CountAsync();
+
+            var data = await query
+                .OrderByDescending(r => r.SubmittedAt)
+                .Skip((pagination.Page - 1) * pagination.PageSize)
+                .Take(pagination.PageSize)
                 .Select(r => new ReportResponseDto
                 {
                     Id = r.Id,
@@ -108,8 +115,18 @@ namespace SmartFollowUp.API.Services
                     RiskLevel = r.AiAnalysis != null ? r.AiAnalysis.RiskLevel : "stable",
                     RiskScore = r.AiAnalysis != null ? r.AiAnalysis.RiskScore ?? 0 : 0
                 })
-                .OrderByDescending(r => r.SubmittedAt)
                 .ToListAsync();
+
+            return new PaginatedResponseDto<ReportResponseDto>
+            {
+                Data = data,
+                CurrentPage = pagination.Page,
+                PageSize = pagination.PageSize,
+                TotalCount = totalCount,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)pagination.PageSize),
+                HasNextPage = pagination.Page * pagination.PageSize < totalCount,
+                HasPreviousPage = pagination.Page > 1
+            };
         }
 
         // AI Risk Calculation

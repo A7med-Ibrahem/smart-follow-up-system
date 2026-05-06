@@ -31,12 +31,12 @@ namespace SmartFollowUp.API.Controllers
             return Ok(result);
         }
 
-        // GET api/reports/case/{caseId}
+        // GET api/reports/case/{caseId}?page=1&pageSize=10
         [HttpGet("case/{caseId}")]
         [Authorize(Roles = "doctor")]
-        public async Task<IActionResult> GetCaseReports(long caseId)
+        public async Task<IActionResult> GetCaseReports(long caseId, [FromQuery] PaginationRequestDto pagination)
         {
-            var result = await _reportService.GetCaseReportsAsync(caseId);
+            var result = await _reportService.GetCaseReportsAsync(caseId, pagination);
             return Ok(result);
         }
     }
