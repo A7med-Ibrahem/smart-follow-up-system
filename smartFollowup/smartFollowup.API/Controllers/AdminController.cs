@@ -12,10 +12,12 @@ namespace SmartFollowUp.API.Controllers
     public class AdminController : ControllerBase
     {
         private readonly AdminService _adminService;
+        private readonly AuditService _auditService;
 
-        public AdminController(AdminService adminService)
+        public AdminController(AdminService adminService, AuditService auditService)
         {
             _adminService = adminService;
+            _auditService = auditService;
         }
 
         // GET api/admin/doctor-requests
@@ -35,6 +37,16 @@ namespace SmartFollowUp.API.Controllers
             if (!success)
                 return NotFound(new { message = "Request not found or already processed" });
 
+            await _auditService.LogAsync(
+                action: "APPROVE",
+                entityName: "DoctorRequest",
+                entityId: id.ToString(),
+                userId: adminId,
+                userName: "Admin",
+                userRole: "admin",
+                ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString()
+            );
+
             return Ok(new { message = "Doctor approved successfully" });
         }
 
@@ -46,6 +58,17 @@ namespace SmartFollowUp.API.Controllers
             var success = await _adminService.RejectDoctorRequestAsync(id, adminId, request.RejectionReason);
             if (!success)
                 return NotFound(new { message = "Request not found or already processed" });
+
+            await _auditService.LogAsync(
+                action: "REJECT",
+                entityName: "DoctorRequest",
+                entityId: id.ToString(),
+                newValues: $"Reason: {request.RejectionReason}",
+                userId: adminId,
+                userName: "Admin",
+                userRole: "admin",
+                ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString()
+            );
 
             return Ok(new { message = "Doctor request rejected" });
         }

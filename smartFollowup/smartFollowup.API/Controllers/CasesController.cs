@@ -12,10 +12,12 @@ namespace SmartFollowUp.API.Controllers
     public class CasesController : ControllerBase
     {
         private readonly CaseService _caseService;
+        private readonly AuditService _auditService;
 
-        public CasesController(CaseService caseService)
+        public CasesController(CaseService caseService, AuditService auditService)
         {
             _caseService = caseService;
+            _auditService = auditService;
         }
 
         // POST api/cases
@@ -24,9 +26,22 @@ namespace SmartFollowUp.API.Controllers
         public async Task<IActionResult> CreateCase(CreateCaseRequestDto request)
         {
             var doctorId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var doctorName = User.FindFirst(ClaimTypes.Name)?.Value ?? "Doctor";
+
             var result = await _caseService.CreateCaseAsync(request, doctorId);
             if (result == null)
                 return BadRequest(new { message = "Failed to create case" });
+
+            await _auditService.LogAsync(
+                action: "CREATE",
+                entityName: "Case",
+                entityId: result.Id.ToString(),
+                newValues: $"Patient: {request.PatientName}, Operation: {request.OperationType}",
+                userId: doctorId,
+                userName: doctorName,
+                userRole: "doctor",
+                ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString()
+            );
 
             return Ok(result);
         }
@@ -60,9 +75,21 @@ namespace SmartFollowUp.API.Controllers
         public async Task<IActionResult> CloseCase(long id)
         {
             var doctorId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var doctorName = User.FindFirst(ClaimTypes.Name)?.Value ?? "Doctor";
+
             var success = await _caseService.CloseCaseAsync(id, doctorId);
             if (!success)
                 return NotFound(new { message = "Case not found" });
+
+            await _auditService.LogAsync(
+                action: "CLOSE",
+                entityName: "Case",
+                entityId: id.ToString(),
+                userId: doctorId,
+                userName: doctorName,
+                userRole: "doctor",
+                ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString()
+            );
 
             return Ok(new { message = "Case closed successfully" });
         }

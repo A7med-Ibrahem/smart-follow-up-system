@@ -12,10 +12,12 @@ namespace SmartFollowUp.API.Controllers
     public class PrescriptionsController : ControllerBase
     {
         private readonly PrescriptionService _prescriptionService;
+        private readonly AuditService _auditService;
 
-        public PrescriptionsController(PrescriptionService prescriptionService)
+        public PrescriptionsController(PrescriptionService prescriptionService, AuditService auditService)
         {
             _prescriptionService = prescriptionService;
+            _auditService = auditService;
         }
 
         // POST api/prescriptions
@@ -30,6 +32,17 @@ namespace SmartFollowUp.API.Controllers
             if (result == null)
                 return BadRequest(new { message = "Case not found or not assigned to you" });
 
+            await _auditService.LogAsync(
+                action: "CREATE",
+                entityName: "Prescription",
+                entityId: result.Id.ToString(),
+                newValues: $"CaseId: {request.CaseId}, Medications: {request.Medications.Count}",
+                userId: doctorId,
+                userName: User.FindFirst(ClaimTypes.Name)?.Value ?? "Doctor",
+                userRole: "doctor",
+                ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString()
+            );
+
             return Ok(result);
         }
 
@@ -39,7 +52,6 @@ namespace SmartFollowUp.API.Controllers
         public async Task<IActionResult> GetCasePrescriptions(long caseId)
         {
             var result = await _prescriptionService.GetCasePrescriptionsAsync(caseId);
-
             return Ok(result);
         }
 
@@ -59,20 +71,25 @@ namespace SmartFollowUp.API.Controllers
         // PUT api/prescriptions/{id}
         [HttpPut("{id}")]
         [Authorize(Roles = "doctor")]
-        public async Task<IActionResult> UpdatePrescription(
-            long id,
-            CreatePrescriptionRequestDto request)
+        public async Task<IActionResult> UpdatePrescription(long id, CreatePrescriptionRequestDto request)
         {
-            var doctorId = long.Parse(
-                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var doctorId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-            var result = await _prescriptionService.UpdatePrescriptionAsync(
-                id,
-                request,
-                doctorId);
+            var result = await _prescriptionService.UpdatePrescriptionAsync(id, request, doctorId);
 
             if (result == null)
                 return NotFound(new { message = "Prescription not found" });
+
+            await _auditService.LogAsync(
+                action: "UPDATE",
+                entityName: "Prescription",
+                entityId: id.ToString(),
+                newValues: $"Updated medications: {request.Medications.Count}",
+                userId: doctorId,
+                userName: User.FindFirst(ClaimTypes.Name)?.Value ?? "Doctor",
+                userRole: "doctor",
+                ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString()
+            );
 
             return Ok(result);
         }

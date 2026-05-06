@@ -34,6 +34,7 @@ namespace smartFollowup.API
             builder.Services.AddScoped<PatientService>();
             builder.Services.AddScoped<EmailService>();
             builder.Services.AddScoped<EscalationService>();
+            builder.Services.AddScoped<AuditService>();
 
             // Hangfire
             builder.Services.AddHangfire(x => x.UseSqlServerStorage(

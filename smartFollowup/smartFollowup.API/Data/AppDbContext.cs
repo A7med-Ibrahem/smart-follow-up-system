@@ -21,6 +21,7 @@ namespace SmartFollowUp.API.Data
         public DbSet<MedicationAdherence> MedicationAdherences { get; set; }
         public DbSet<Alert> Alerts { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
