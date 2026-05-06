@@ -252,5 +252,22 @@ namespace SmartFollowUp.API.Services
 
             return true;
         }
+
+        // Change Password
+        public async Task<bool> ChangePasswordAsync(long userId, ChangePasswordRequestDto request)
+        {
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null) return false;
+
+            if (!BCrypt.Net.BCrypt.Verify(request.CurrentPassword, user.PasswordHash))
+                return false;
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+            user.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

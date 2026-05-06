@@ -91,5 +91,18 @@ namespace SmartFollowUp.API.Controllers
             return Ok(new { message = "Logged out successfully" });
         }
 
+        // POST api/auth/change-password
+        [HttpPost("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword(ChangePasswordRequestDto request)
+        {
+            var userId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var success = await _authService.ChangePasswordAsync(userId, request);
+            if (!success)
+                return BadRequest(new { message = "Current password is incorrect" });
+
+            return Ok(new { message = "Password changed successfully" });
+        }
+
     }
 }

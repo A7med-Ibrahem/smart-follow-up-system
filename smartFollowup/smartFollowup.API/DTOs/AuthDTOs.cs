@@ -56,14 +56,20 @@
     }
 }
 
-public class RefreshTokenRequestDto
-{
-    public string RefreshToken { get; set; } = string.Empty;
-}
+    public class RefreshTokenRequestDto
+    {
+        public string RefreshToken { get; set; } = string.Empty;
+    }
 
-public class TokenResponseDto
-{
-    public string AccessToken { get; set; } = string.Empty;
-    public string RefreshToken { get; set; } = string.Empty;
-    public DateTime RefreshTokenExpiry { get; set; }
-}
+        public class TokenResponseDto
+    {
+        public string AccessToken { get; set; } = string.Empty;
+        public string RefreshToken { get; set; } = string.Empty;
+        public DateTime RefreshTokenExpiry { get; set; }
+    }
+
+        public class ChangePasswordRequestDto
+    {
+        public string CurrentPassword { get; set; } = string.Empty;
+        public string NewPassword { get; set; } = string.Empty;
+    }
