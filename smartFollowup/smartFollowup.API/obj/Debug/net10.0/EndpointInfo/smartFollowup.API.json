@@ -528,6 +528,47 @@
         }
       }
     },
+    "/api/Doctor/profile": {
+      "get": {
+        "tags": [
+          "Doctor"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Doctor"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDoctorProfileRequestDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDoctorProfileRequestDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDoctorProfileRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/Notes": {
       "post": {
         "tags": [
@@ -1220,6 +1261,24 @@
             "nullable": true
           },
           "newPassword": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateDoctorProfileRequestDto": {
+        "type": "object",
+        "properties": {
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "specialty": {
+            "type": "string",
+            "nullable": true
+          },
+          "hospital": {
             "type": "string",
             "nullable": true
           }

@@ -322,6 +322,32 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "SmartFollowUp.API.Controllers.DoctorController",
+    "Method": "GetProfile",
+    "RelativePath": "api/Doctor/profile",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SmartFollowUp.API.Controllers.DoctorController",
+    "Method": "UpdateProfile",
+    "RelativePath": "api/Doctor/profile",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "SmartFollowUp.API.DTOs.UpdateDoctorProfileRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "SmartFollowUp.API.Controllers.NotesController",
     "Method": "AddNote",
     "RelativePath": "api/Notes",

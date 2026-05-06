@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("smartFollowup.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c6162c1e3b5ba3a756396c0c0dc46c9efb8df411")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4e809015ba9a7ab594a6525ad5130004a5f3101e")]
 [assembly: System.Reflection.AssemblyProductAttribute("smartFollowup.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("smartFollowup.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
