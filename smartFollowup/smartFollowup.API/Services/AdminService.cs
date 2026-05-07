@@ -107,6 +107,21 @@ namespace SmartFollowUp.API.Services
 
             await _context.SaveChangesAsync();
 
+            // بعت Email للدكتور
+            await _emailService.SendEmailAsync(
+                request.Email,
+                request.Name,
+                "Smart Follow Up — Application Update",
+                $@"
+        <h2>Dear {request.Name},</h2>
+        <p>We regret to inform you that your registration request has been rejected.</p>
+        <p><strong>Reason:</strong> {reason}</p>
+        <p>If you have any questions, please contact support.</p>
+        <br>
+        <p>Smart Follow Up Team</p>
+        "
+            );
+
             return true;
         }
 
