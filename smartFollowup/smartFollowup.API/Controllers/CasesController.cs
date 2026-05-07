@@ -103,5 +103,18 @@ namespace SmartFollowUp.API.Controllers
             var result = await _caseService.SearchPatientsAsync(keyword, doctorId);
             return Ok(result);
         }
+
+        // DELETE api/cases/{id}
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "doctor")]
+        public async Task<IActionResult> DeleteCase(long id)
+        {
+            var doctorId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var success = await _caseService.DeleteCaseAsync(id, doctorId);
+            if (!success)
+                return NotFound(new { message = "Case not found" });
+
+            return Ok(new { message = "Case deleted successfully" });
+        }
     }
 }

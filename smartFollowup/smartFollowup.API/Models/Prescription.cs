@@ -9,6 +9,9 @@
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
 
+        public bool IsDeleted { get; set; } = false;
+        public DateTime? DeletedAt { get; set; }
+
         // Navigation Properties
         public Case Case { get; set; } = null!;
         public User Doctor { get; set; } = null!;

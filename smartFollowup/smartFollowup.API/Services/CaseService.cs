@@ -167,5 +167,20 @@ namespace SmartFollowUp.API.Services
                 })
                 .ToListAsync();
         }
+
+        // Soft Delete Case
+        public async Task<bool> DeleteCaseAsync(long caseId, long doctorId)
+        {
+            var c = await _context.Cases
+                .FirstOrDefaultAsync(c => c.Id == caseId && c.DoctorId == doctorId);
+
+            if (c == null) return false;
+
+            c.IsDeleted = true;
+            c.DeletedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

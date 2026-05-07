@@ -96,6 +96,16 @@ namespace SmartFollowUp.API.Data
             {
                 relationship.DeleteBehavior = DeleteBehavior.Restrict;
             }
+
+            // Global Soft Delete Filters
+            modelBuilder.Entity<Case>()
+                .HasQueryFilter(c => !c.IsDeleted);
+
+            modelBuilder.Entity<User>()
+                .HasQueryFilter(u => !u.IsDeleted);
+
+            modelBuilder.Entity<Prescription>()
+                .HasQueryFilter(p => !p.IsDeleted);
         }
     }
 }
