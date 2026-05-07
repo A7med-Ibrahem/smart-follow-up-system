@@ -20,11 +20,14 @@ namespace SmartFollowUp.API.Services
         // Create Case
         public async Task<CaseResponseDto?> CreateCaseAsync(CreateCaseRequestDto request, long doctorId)
         {
+            var isNewPatient = false;
+
             var patient = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email == request.PatientEmail);
 
             if (patient == null)
             {
+                isNewPatient = true;
                 patient = new User
                 {
                     Name = request.PatientName,
@@ -52,11 +55,15 @@ namespace SmartFollowUp.API.Services
             _context.Cases.Add(newCase);
             await _context.SaveChangesAsync();
 
-            await _emailService.SendPatientActivationEmailAsync(
-            patient.Email,
-            patient.Name,
-            "Smart@123"
-                       );
+            // بعت Email بس لو مريض جديد
+            if (isNewPatient)
+            {
+                await _emailService.SendPatientActivationEmailAsync(
+                    patient.Email,
+                    patient.Name,
+                    "Smart@123"
+                );
+            }
 
             return new CaseResponseDto
             {
