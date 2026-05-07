@@ -10,7 +10,8 @@
         public string? Phone { get; set; }
         public bool IsActive { get; set; } = false;
         public string? ActivationToken { get; set; }
-        public string? ResetToken { get; set; }
+        public string? OtpCode { get; set; }
+        public DateTime? OtpExpiry { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
 

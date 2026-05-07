@@ -35,7 +35,6 @@ namespace SmartFollowUp.API.Services
             if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
                 return null;
 
-            //  Generate Refresh Token
             var refreshToken = GenerateRefreshToken();
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
@@ -87,7 +86,6 @@ namespace SmartFollowUp.API.Services
             _context.PatientProfiles.Add(patientProfile);
             await _context.SaveChangesAsync();
 
-            //  Generate Refresh Token
             var refreshToken = GenerateRefreshToken();
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
@@ -141,15 +139,16 @@ namespace SmartFollowUp.API.Services
 
             if (user == null) return false;
 
-            var resetToken = Guid.NewGuid().ToString("N")[..8].ToUpper();
-            user.ResetToken = resetToken;
+            var otpCode = new Random().Next(100000, 999999).ToString();
+            user.OtpCode = otpCode;
+            user.OtpExpiry = DateTime.UtcNow.AddMinutes(10);
             user.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
             await _emailService.SendPasswordResetEmailAsync(
                 user.Email,
                 user.Name,
-                resetToken
+                otpCode
             );
 
             return true;
@@ -161,12 +160,51 @@ namespace SmartFollowUp.API.Services
         public async Task<bool> ResetPasswordAsync(ResetPasswordRequestDto request)
         {
             var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == request.Email && u.ResetToken == request.Token);
+                .FirstOrDefaultAsync(u =>
+                    u.Email == request.Email &&
+                    u.OtpCode == request.Token &&
+                    u.OtpExpiry > DateTime.UtcNow);
 
             if (user == null) return false;
 
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
-            user.ResetToken = null;
+            user.OtpCode = null;
+            user.OtpExpiry = null;
+            user.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        // ============================
+        // Logout
+        // ============================
+        public async Task<bool> LogoutAsync(long userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null) return false;
+
+            user.RefreshToken = null;
+            user.RefreshTokenExpiry = null;
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        // ============================
+        // Change Password
+        // ============================
+        public async Task<bool> ChangePasswordAsync(long userId, ChangePasswordRequestDto request)
+        {
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null) return false;
+
+            if (!BCrypt.Net.BCrypt.Verify(request.CurrentPassword, user.PasswordHash))
+                return false;
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
             user.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
@@ -201,7 +239,6 @@ namespace SmartFollowUp.API.Services
 
             user.RefreshToken = newRefreshToken;
             user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
-
             await _context.SaveChangesAsync();
 
             return new TokenResponseDto
@@ -213,7 +250,7 @@ namespace SmartFollowUp.API.Services
         }
 
         // ============================
-        // Generate JWT Token (UPDATED)
+        // Generate JWT Token
         // ============================
         private string GenerateToken(User user)
         {
@@ -233,41 +270,11 @@ namespace SmartFollowUp.API.Services
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(15), 
+                expires: DateTime.UtcNow.AddMinutes(15),
                 signingCredentials: credentials
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-        // Logout
-        public async Task<bool> LogoutAsync(long userId)
-        {
-            var user = await _context.Users.FindAsync(userId);
-
-            if (user == null) return false;
-
-            user.RefreshToken = null;
-            user.RefreshTokenExpiry = null;
-            await _context.SaveChangesAsync();
-
-            return true;
-        }
-
-        // Change Password
-        public async Task<bool> ChangePasswordAsync(long userId, ChangePasswordRequestDto request)
-        {
-            var user = await _context.Users.FindAsync(userId);
-
-            if (user == null) return false;
-
-            if (!BCrypt.Net.BCrypt.Verify(request.CurrentPassword, user.PasswordHash))
-                return false;
-
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
-            user.UpdatedAt = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
-
-            return true;
         }
     }
 }
