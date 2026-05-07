@@ -9,6 +9,9 @@ using System.Text;
 using SmartFollowUp.API.Hubs;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using SmartFollowUp.API.Validators;
 
 namespace smartFollowup.API
 {
@@ -38,6 +41,8 @@ namespace smartFollowup.API
             builder.Services.AddScoped<EscalationService>();
             builder.Services.AddScoped<AuditService>();
             builder.Services.AddScoped<DoctorService>();
+            builder.Services.AddFluentValidationAutoValidation();
+            builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
 
 
 

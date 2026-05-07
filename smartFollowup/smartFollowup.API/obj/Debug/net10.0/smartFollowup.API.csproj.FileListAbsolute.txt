@@ -184,3 +184,6 @@ D:\project API\smartFollowup\smartFollowup.API\bin\Debug\net10.0\tr-TR\Hangfire.
 D:\project API\smartFollowup\smartFollowup.API\bin\Debug\net10.0\zh-TW\Hangfire.Core.resources.dll
 D:\project API\smartFollowup\smartFollowup.API\bin\Debug\net10.0\zh\Hangfire.Core.resources.dll
 D:\project API\smartFollowup\smartFollowup.API\obj\Debug\net10.0\smartFollowup.API.sourcelink.json
+D:\project API\smartFollowup\smartFollowup.API\bin\Debug\net10.0\FluentValidation.dll
+D:\project API\smartFollowup\smartFollowup.API\bin\Debug\net10.0\FluentValidation.AspNetCore.dll
+D:\project API\smartFollowup\smartFollowup.API\bin\Debug\net10.0\FluentValidation.DependencyInjectionExtensions.dll

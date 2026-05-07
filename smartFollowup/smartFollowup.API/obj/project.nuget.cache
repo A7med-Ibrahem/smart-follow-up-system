@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "Cy8Rl88FymA=",
+  "dgSpecHash": "36XALBQlKl0=",
   "success": true,
   "projectFilePath": "D:\\project API\\smartFollowup\\smartFollowup.API\\smartFollowup.API.csproj",
   "expectedPackageFiles": [
@@ -8,6 +8,9 @@
     "C:\\Users\\Elnour Tech\\.nuget\\packages\\azure.identity\\1.14.2\\azure.identity.1.14.2.nupkg.sha512",
     "C:\\Users\\Elnour Tech\\.nuget\\packages\\bcrypt.net-next\\4.1.0\\bcrypt.net-next.4.1.0.nupkg.sha512",
     "C:\\Users\\Elnour Tech\\.nuget\\packages\\bouncycastle.cryptography\\2.6.2\\bouncycastle.cryptography.2.6.2.nupkg.sha512",
+    "C:\\Users\\Elnour Tech\\.nuget\\packages\\fluentvalidation\\11.11.0\\fluentvalidation.11.11.0.nupkg.sha512",
+    "C:\\Users\\Elnour Tech\\.nuget\\packages\\fluentvalidation.aspnetcore\\11.3.1\\fluentvalidation.aspnetcore.11.3.1.nupkg.sha512",
+    "C:\\Users\\Elnour Tech\\.nuget\\packages\\fluentvalidation.dependencyinjectionextensions\\11.11.0\\fluentvalidation.dependencyinjectionextensions.11.11.0.nupkg.sha512",
     "C:\\Users\\Elnour Tech\\.nuget\\packages\\hangfire.aspnetcore\\1.8.23\\hangfire.aspnetcore.1.8.23.nupkg.sha512",
     "C:\\Users\\Elnour Tech\\.nuget\\packages\\hangfire.core\\1.8.23\\hangfire.core.1.8.23.nupkg.sha512",
     "C:\\Users\\Elnour Tech\\.nuget\\packages\\hangfire.netcore\\1.8.23\\hangfire.netcore.1.8.23.nupkg.sha512",
