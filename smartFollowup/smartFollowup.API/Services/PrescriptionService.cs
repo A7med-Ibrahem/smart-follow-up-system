@@ -8,10 +8,12 @@ namespace SmartFollowUp.API.Services
     public class PrescriptionService
     {
         private readonly AppDbContext _context;
+        private readonly NotificationService _notificationService;
 
-        public PrescriptionService(AppDbContext context)
+        public PrescriptionService(AppDbContext context, NotificationService notificationService)
         {
             _context = context;
+            _notificationService = notificationService;
         }
 
         // Create Prescription
@@ -105,6 +107,7 @@ namespace SmartFollowUp.API.Services
         {
             var prescription = await _context.Prescriptions
                 .Include(p => p.Medications)
+                .Include(p => p.Case)
                 .FirstOrDefaultAsync(p => p.Id == prescriptionId && p.DoctorId == doctorId);
 
             if (prescription == null) return null;
@@ -112,6 +115,12 @@ namespace SmartFollowUp.API.Services
             prescription.Instructions = request.Instructions;
             prescription.UpdatedAt = DateTime.UtcNow;
 
+            foreach (var med in prescription.Medications)
+            {
+                var adherences = _context.MedicationAdherences
+                    .Where(a => a.MedicationId == med.Id);
+                _context.MedicationAdherences.RemoveRange(adherences);
+            }
             _context.PrescriptionMedications.RemoveRange(prescription.Medications);
 
             foreach (var med in request.Medications)
@@ -127,6 +136,15 @@ namespace SmartFollowUp.API.Services
             }
 
             await _context.SaveChangesAsync();
+
+            // بعت Notification للمريض
+            await _notificationService.SendNotificationAsync(
+                prescription.Case.PatientId,
+                "prescription",
+                "Prescription Updated 💊",
+                "Your doctor has updated your prescription. Please check your medications."
+            );
+
             return await GetPrescriptionByIdAsync(prescriptionId);
         }
 

@@ -53,7 +53,7 @@ namespace SmartFollowUp.API.Services
             {
                 Name = request.Name,
                 Email = request.Email,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"),
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Smart@123"),
                 Role = "doctor",
                 IsActive = true
             };
