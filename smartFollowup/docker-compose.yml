@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./smartFollowup
+      dockerfile: smartFollowup.API/Dockerfile
+    container_name: smart-followup-api
+    ports:
+      - "5282:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=SmartFollowUpDB;User Id=sa;Password=Smart@123456;TrustServerCertificate=True
+      - Jwt__Key=${JWT_KEY}
+      - Jwt__Issuer=SmartFollowUpAPI
+      - Jwt__Audience=SmartFollowUpClient
+      - Jwt__ExpireDays=7
+      - Email__Host=smtp.gmail.com
+      - Email__Port=587
+      - Email__Username=${EMAIL_USERNAME}
+      - Email__Password=${EMAIL_PASSWORD}
+      - Email__FromName=Smart Follow Up
+    depends_on:
+      - sqlserver
+    networks:
+      - smartfollowup-network
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: smart-followup-db
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Smart@123456
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    networks:
+      - smartfollowup-network
+
+volumes:
+  sqlserver-data:
+
+networks:
+  smartfollowup-network:
+    driver: bridge

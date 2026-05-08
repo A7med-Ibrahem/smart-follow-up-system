@@ -12,6 +12,7 @@ using System.Threading.RateLimiting;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using SmartFollowUp.API.Validators;
+using SmartFollowUp.API.Interfaces;
 
 namespace smartFollowup.API
 {
@@ -43,7 +44,7 @@ namespace smartFollowup.API
             builder.Services.AddScoped<DoctorService>();
             builder.Services.AddFluentValidationAutoValidation();
             builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
-
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 
             // Rate Limiting
