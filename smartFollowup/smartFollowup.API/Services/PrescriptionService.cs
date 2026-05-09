@@ -2,6 +2,7 @@
 using SmartFollowUp.API.Data;
 using SmartFollowUp.API.DTOs;
 using SmartFollowUp.API.Models;
+using SmartFollowUp.API.Enums;
 
 namespace SmartFollowUp.API.Services
 {
@@ -48,6 +49,7 @@ namespace SmartFollowUp.API.Services
             }
 
             await _context.SaveChangesAsync();
+
             return await GetPrescriptionByIdAsync(prescription.Id);
         }
 
@@ -79,19 +81,19 @@ namespace SmartFollowUp.API.Services
         // Get Prescription by ID
         public async Task<PrescriptionResponseDto?> GetPrescriptionByIdAsync(long prescriptionId)
         {
-            var p = await _context.Prescriptions
+            var prescription = await _context.Prescriptions
                 .Include(p => p.Medications)
                 .FirstOrDefaultAsync(p => p.Id == prescriptionId);
 
-            if (p == null) return null;
+            if (prescription == null) return null;
 
             return new PrescriptionResponseDto
             {
-                Id = p.Id,
-                CaseId = p.CaseId,
-                Instructions = p.Instructions,
-                CreatedAt = p.CreatedAt,
-                Medications = p.Medications.Select(m => new MedicationResponseDto
+                Id = prescription.Id,
+                CaseId = prescription.CaseId,
+                Instructions = prescription.Instructions,
+                CreatedAt = prescription.CreatedAt,
+                Medications = prescription.Medications.Select(m => new MedicationResponseDto
                 {
                     Id = m.Id,
                     MedicationName = m.MedicationName,
@@ -119,8 +121,10 @@ namespace SmartFollowUp.API.Services
             {
                 var adherences = _context.MedicationAdherences
                     .Where(a => a.MedicationId == med.Id);
+
                 _context.MedicationAdherences.RemoveRange(adherences);
             }
+
             _context.PrescriptionMedications.RemoveRange(prescription.Medications);
 
             foreach (var med in request.Medications)
@@ -137,7 +141,7 @@ namespace SmartFollowUp.API.Services
 
             await _context.SaveChangesAsync();
 
-            // بعت Notification للمريض
+            // Send Notification to Patient
             await _notificationService.SendNotificationAsync(
                 prescription.Case.PatientId,
                 "prescription",
@@ -154,7 +158,9 @@ namespace SmartFollowUp.API.Services
             var medication = await _context.PrescriptionMedications
                 .Include(m => m.Prescription)
                     .ThenInclude(p => p.Case)
-                .FirstOrDefaultAsync(m => m.Id == medicationId && m.Prescription.Case.PatientId == patientId);
+                .FirstOrDefaultAsync(m =>
+                    m.Id == medicationId &&
+                    m.Prescription.Case.PatientId == patientId);
 
             if (medication == null) return false;
 
@@ -164,10 +170,11 @@ namespace SmartFollowUp.API.Services
                 PatientId = patientId,
                 ScheduledAt = DateTime.UtcNow,
                 ConfirmedAt = DateTime.UtcNow,
-                Status = "taken"
+                Status = MedicationStatus.Taken
             };
 
             _context.MedicationAdherences.Add(adherence);
+
             await _context.SaveChangesAsync();
 
             return true;

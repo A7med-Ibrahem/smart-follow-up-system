@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SmartFollowUp.API.Data;
-using SmartFollowUp.API.Models;
+using SmartFollowUp.API.Enums;
 
 namespace SmartFollowUp.API.Services
 {
@@ -15,29 +15,25 @@ namespace SmartFollowUp.API.Services
             _notificationService = notificationService;
         }
 
-        // Check and Escalate Emergency Cases
         public async Task CheckAndEscalateAsync()
         {
-            // جيب كل الـ Critical Cases اللي الـ Alert بتاعها لسه Open
             var criticalAlerts = await _context.Alerts
                 .Include(a => a.Case)
                     .ThenInclude(c => c.Patient)
                 .Include(a => a.Case)
                     .ThenInclude(c => c.Doctor)
-                .Where(a => a.AlertType == "critical" &&
-                            a.Status == "open" &&
+                .Where(a => a.AlertType == AlertType.Critical &&
+                            a.Status == AlertStatus.Open &&
                             a.TriggeredAt < DateTime.UtcNow.AddHours(-1))
                 .ToListAsync();
 
             foreach (var alert in criticalAlerts)
             {
-                // رفع الـ Priority لـ high
-                alert.Priority = "high";
+                alert.Priority = AlertPriority.High;
 
-                // بعت notification للدكتور تاني
                 await _notificationService.SendNotificationAsync(
                     alert.Case.DoctorId,
-                    "alert",
+                    NotificationType.Alert.ToString(),
                     "🚨 Emergency Escalation",
                     $"Patient {alert.Case.Patient.Name} has a critical condition that requires immediate attention!",
                     alert.Id

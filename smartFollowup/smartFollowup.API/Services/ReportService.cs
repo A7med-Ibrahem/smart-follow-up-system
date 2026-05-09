@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SmartFollowUp.API.Data;
 using SmartFollowUp.API.DTOs;
+using SmartFollowUp.API.Enums;
 using SmartFollowUp.API.Models;
 
 namespace SmartFollowUp.API.Services
@@ -47,7 +48,7 @@ namespace SmartFollowUp.API.Services
             {
                 ReportId = report.Id,
                 RiskScore = riskScore,
-                RiskLevel = riskLevel,
+                RiskLevel = riskLevel.ToString(),
                 AnalysisDetails = $"{{\"painLevel\":{request.PainLevel},\"temperature\":{request.Temperature},\"swelling\":{request.Swelling},\"bleeding\":{request.Bleeding}}}",
                 AnalyzedAt = DateTime.UtcNow
             };
@@ -58,15 +59,15 @@ namespace SmartFollowUp.API.Services
             existingCase.CurrentRiskLevel = riskLevel;
 
             // لو Critical — عمل Alert
-            if (riskLevel == "critical")
+            if (riskLevel == RiskLevel.Critical)
             {
                 var alert = new Alert
                 {
                     CaseId = request.CaseId,
                     ReportId = report.Id,
-                    AlertType = "critical",
-                    Priority = "high",
-                    Status = "open",
+                    AlertType = AlertType.Critical,
+                    Priority = AlertPriority.High,
+                    Status = AlertStatus.Open,
                     TriggeredAt = DateTime.UtcNow
                 };
                 _context.Alerts.Add(alert);
@@ -77,17 +78,17 @@ namespace SmartFollowUp.API.Services
             // بعت Notification للمريض
             await _notificationService.SendNotificationAsync(
                 patientId,
-                "reminder",
+                NotificationType.Reminder.ToString(),
                 "Report Submitted ✅",
                 $"Your daily report has been received. Risk Level: {riskLevel}"
             );
 
             // لو Critical — بعت Notification للدكتور
-            if (riskLevel == "critical")
+            if (riskLevel == RiskLevel.Critical)
             {
                 await _notificationService.SendNotificationAsync(
                     existingCase.DoctorId,
-                    "alert",
+                    NotificationType.Alert.ToString(),
                     "🚨 Critical Patient Alert",
                     "Patient report shows critical condition. Immediate attention required!"
                 );
@@ -103,7 +104,7 @@ namespace SmartFollowUp.API.Services
                 Bleeding = report.Bleeding,
                 Notes = report.Notes,
                 SubmittedAt = report.SubmittedAt,
-                RiskLevel = riskLevel,
+                RiskLevel = riskLevel.ToString(),
                 RiskScore = riskScore
             };
         }
@@ -149,12 +150,12 @@ namespace SmartFollowUp.API.Services
         }
 
         // AI Risk Calculation
-        private string CalculateRiskLevel(CreateReportRequestDto request)
+        private RiskLevel CalculateRiskLevel(CreateReportRequestDto request)
         {
             var score = CalculateRiskScore(request);
-            if (score >= 70) return "critical";
-            if (score >= 40) return "moderate";
-            return "stable";
+            if (score >= 70) return RiskLevel.Critical;
+            if (score >= 40) return RiskLevel.Moderate;
+            return RiskLevel.Stable;
         }
 
         private decimal CalculateRiskScore(CreateReportRequestDto request)

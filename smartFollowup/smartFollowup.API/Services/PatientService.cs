@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SmartFollowUp.API.Data;
 using SmartFollowUp.API.DTOs;
+using SmartFollowUp.API.Enums;
 
 namespace SmartFollowUp.API.Services
 {
@@ -18,7 +19,7 @@ namespace SmartFollowUp.API.Services
         {
             var user = await _context.Users
                 .Include(u => u.PatientProfile)
-                .FirstOrDefaultAsync(u => u.Id == patientId && u.Role == "patient");
+                .FirstOrDefaultAsync(u => u.Id == patientId && u.Role == UserRole.Patient);
 
             if (user == null) return null;
 
@@ -34,11 +35,11 @@ namespace SmartFollowUp.API.Services
                 Email = user.Email,
                 Phone = user.Phone,
                 Age = user.PatientProfile?.Age,
-                Gender = user.PatientProfile?.Gender,
+                Gender = user.PatientProfile?.Gender?.ToString(),
                 ChronicDiseases = user.PatientProfile?.ChronicDiseases,
                 Allergies = user.PatientProfile?.Allergies,
                 CurrentMedications = user.PatientProfile?.CurrentMedications,
-                RiskLevel = latestCase?.CurrentRiskLevel ?? "stable"
+                RiskLevel = latestCase?.CurrentRiskLevel.ToString() ?? RiskLevel.Stable.ToString()
             };
         }
 
@@ -47,15 +48,13 @@ namespace SmartFollowUp.API.Services
         {
             var user = await _context.Users
                 .Include(u => u.PatientProfile)
-                .FirstOrDefaultAsync(u => u.Id == patientId && u.Role == "patient");
+                .FirstOrDefaultAsync(u => u.Id == patientId && u.Role == UserRole.Patient);
 
             if (user == null) return null;
 
-            // Update Phone
             if (request.Phone != null)
                 user.Phone = request.Phone;
 
-            // Update Profile
             if (user.PatientProfile != null)
             {
                 if (request.Allergies != null)

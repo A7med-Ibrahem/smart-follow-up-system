@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SmartFollowUp.API.Data;
 using SmartFollowUp.API.DTOs;
+using SmartFollowUp.API.Enums;
 using SmartFollowUp.API.Hubs;
 using SmartFollowUp.API.Models;
 
@@ -21,11 +22,14 @@ namespace SmartFollowUp.API.Services
         // Send Notification
         public async Task SendNotificationAsync(long userId, string type, string title, string body, long? alertId = null)
         {
+            // Convert string to Enum
+            Enum.TryParse<NotificationType>(type, true, out var notificationType);
+
             var notification = new Notification
             {
                 UserId = userId,
                 AlertId = alertId,
-                Type = type,
+                Type = notificationType,
                 Title = title,
                 Body = body,
                 IsRead = false,
@@ -35,13 +39,12 @@ namespace SmartFollowUp.API.Services
             _context.Notifications.Add(notification);
             await _context.SaveChangesAsync();
 
-            // بعت Real-time للـ User فوراً
             await _hubContext.Clients
                 .Group($"user_{userId}")
                 .SendAsync("ReceiveNotification", new
                 {
                     notification.Id,
-                    notification.Type,
+                    Type = notification.Type.ToString(),
                     notification.Title,
                     notification.Body,
                     notification.IsRead,
@@ -64,7 +67,7 @@ namespace SmartFollowUp.API.Services
                 .Select(n => new NotificationResponseDto
                 {
                     Id = n.Id,
-                    Type = n.Type,
+                    Type = n.Type.ToString(),
                     Title = n.Title,
                     Body = n.Body,
                     IsRead = n.IsRead,

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SmartFollowUp.API.Data;
 using SmartFollowUp.API.DTOs;
+using SmartFollowUp.API.Enums;
 
 namespace SmartFollowUp.API.Services
 {
@@ -18,7 +19,7 @@ namespace SmartFollowUp.API.Services
         {
             var user = await _context.Users
                 .Include(u => u.DoctorProfile)
-                .FirstOrDefaultAsync(u => u.Id == doctorId && u.Role == "doctor");
+                .FirstOrDefaultAsync(u => u.Id == doctorId && u.Role == UserRole.Doctor);
 
             if (user == null) return null;
 
@@ -39,7 +40,7 @@ namespace SmartFollowUp.API.Services
         {
             var user = await _context.Users
                 .Include(u => u.DoctorProfile)
-                .FirstOrDefaultAsync(u => u.Id == doctorId && u.Role == "doctor");
+                .FirstOrDefaultAsync(u => u.Id == doctorId && u.Role == UserRole.Doctor);
 
             if (user == null) return null;
 

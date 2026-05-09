@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using SmartFollowUp.API.Data;
 using SmartFollowUp.API.DTOs;
+using SmartFollowUp.API.Enums;
 using SmartFollowUp.API.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -22,9 +23,7 @@ namespace SmartFollowUp.API.Services
             _emailService = emailService;
         }
 
-        // ============================
         // Login
-        // ============================
         public async Task<AuthResponseDto?> LoginAsync(LoginRequestDto request)
         {
             var user = await _context.Users
@@ -45,16 +44,14 @@ namespace SmartFollowUp.API.Services
                 Id = user.Id,
                 Name = user.Name,
                 Email = user.Email,
-                Role = user.Role,
+                Role = user.Role.ToString(),
                 Token = GenerateToken(user),
                 RefreshToken = refreshToken,
                 RefreshTokenExpiry = user.RefreshTokenExpiry.Value
             };
         }
 
-        // ============================
         // Register Patient
-        // ============================
         public async Task<AuthResponseDto?> RegisterPatientAsync(RegisterPatientRequestDto request)
         {
             if (await _context.Users.AnyAsync(u => u.Email == request.Email))
@@ -65,7 +62,7 @@ namespace SmartFollowUp.API.Services
                 Name = request.Name,
                 Email = request.Email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-                Role = "patient",
+                Role = UserRole.Patient,
                 Phone = request.Phone,
                 IsActive = true
             };
@@ -77,7 +74,7 @@ namespace SmartFollowUp.API.Services
             {
                 UserId = user.Id,
                 Age = request.Age,
-                Gender = request.Gender,
+                Gender = request.Gender == "male" ? Gender.Male : Gender.Female,
                 ChronicDiseases = request.ChronicDiseases,
                 Allergies = request.Allergies,
                 CurrentMedications = request.CurrentMedications
@@ -96,16 +93,14 @@ namespace SmartFollowUp.API.Services
                 Id = user.Id,
                 Name = user.Name,
                 Email = user.Email,
-                Role = user.Role,
+                Role = user.Role.ToString(),
                 Token = GenerateToken(user),
                 RefreshToken = refreshToken,
                 RefreshTokenExpiry = user.RefreshTokenExpiry.Value
             };
         }
 
-        // ============================
         // Submit Doctor Request
-        // ============================
         public async Task<bool> SubmitDoctorRequestAsync(DoctorRequestDto request)
         {
             var emailExists = await _context.Users.AnyAsync(u => u.Email == request.Email) ||
@@ -119,7 +114,7 @@ namespace SmartFollowUp.API.Services
                 Email = request.Email,
                 Specialty = request.Specialty,
                 LicenseNumber = request.LicenseNumber,
-                Status = "pending",
+                Status = DoctorRequestStatus.Pending,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -129,9 +124,7 @@ namespace SmartFollowUp.API.Services
             return true;
         }
 
-        // ============================
         // Forgot Password
-        // ============================
         public async Task<bool> ForgotPasswordAsync(string email)
         {
             var user = await _context.Users
@@ -154,9 +147,7 @@ namespace SmartFollowUp.API.Services
             return true;
         }
 
-        // ============================
         // Reset Password
-        // ============================
         public async Task<bool> ResetPasswordAsync(ResetPasswordRequestDto request)
         {
             var user = await _context.Users
@@ -176,9 +167,7 @@ namespace SmartFollowUp.API.Services
             return true;
         }
 
-        // ============================
         // Logout
-        // ============================
         public async Task<bool> LogoutAsync(long userId)
         {
             var user = await _context.Users.FindAsync(userId);
@@ -192,9 +181,7 @@ namespace SmartFollowUp.API.Services
             return true;
         }
 
-        // ============================
         // Change Password
-        // ============================
         public async Task<bool> ChangePasswordAsync(long userId, ChangePasswordRequestDto request)
         {
             var user = await _context.Users.FindAsync(userId);
@@ -211,9 +198,7 @@ namespace SmartFollowUp.API.Services
             return true;
         }
 
-        // ============================
         // Generate Refresh Token
-        // ============================
         private string GenerateRefreshToken()
         {
             var randomBytes = new byte[64];
@@ -222,9 +207,7 @@ namespace SmartFollowUp.API.Services
             return Convert.ToBase64String(randomBytes);
         }
 
-        // ============================
         // Refresh Token
-        // ============================
         public async Task<TokenResponseDto?> RefreshTokenAsync(string refreshToken)
         {
             var user = await _context.Users
@@ -249,9 +232,7 @@ namespace SmartFollowUp.API.Services
             };
         }
 
-        // ============================
         // Generate JWT Token
-        // ============================
         private string GenerateToken(User user)
         {
             var key = new SymmetricSecurityKey(
@@ -263,7 +244,7 @@ namespace SmartFollowUp.API.Services
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role)
+                new Claim(ClaimTypes.Role, user.Role.ToString())
             };
 
             var token = new JwtSecurityToken(

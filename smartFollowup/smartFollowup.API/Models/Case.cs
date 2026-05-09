@@ -1,4 +1,6 @@
-﻿namespace SmartFollowUp.API.Models
+﻿using SmartFollowUp.API.Enums;
+
+namespace SmartFollowUp.API.Models
 {
     public class Case
     {
@@ -8,8 +10,8 @@
         public string? OperationType { get; set; }
         public DateTime? OperationDate { get; set; }
         public string? InitialTreatment { get; set; }
-        public string Status { get; set; } = "active"; // active, closed, archived
-        public string CurrentRiskLevel { get; set; } = "stable"; // stable, moderate, critical
+        public CaseStatus Status { get; set; } = CaseStatus.Active;
+        public RiskLevel CurrentRiskLevel { get; set; } = RiskLevel.Stable;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? ClosedAt { get; set; }
 

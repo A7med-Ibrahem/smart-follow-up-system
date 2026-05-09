@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SmartFollowUp.API.Data;
 using SmartFollowUp.API.DTOs;
+using SmartFollowUp.API.Enums;
 using SmartFollowUp.API.Interfaces;
 using SmartFollowUp.API.Models;
 
@@ -41,7 +42,7 @@ namespace SmartFollowUp.API.Services
                         Email = request.PatientEmail,
                         Phone = request.PatientPhone,
                         PasswordHash = BCrypt.Net.BCrypt.HashPassword("Smart@123"),
-                        Role = "patient",
+                        Role = UserRole.Patient,
                         IsActive = true
                     };
 
@@ -56,16 +57,14 @@ namespace SmartFollowUp.API.Services
                     OperationType = request.OperationType,
                     OperationDate = request.OperationDate,
                     InitialTreatment = request.InitialTreatment,
-                    Status = "active",
-                    CurrentRiskLevel = "stable"
+                    Status = CaseStatus.Active,
+                    CurrentRiskLevel = RiskLevel.Stable
                 };
 
                 _context.Cases.Add(newCase);
-
                 await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitTransactionAsync();
 
-                // بعت Email بس لو مريض جديد
                 if (isNewPatient)
                 {
                     await _emailService.SendPatientActivationEmailAsync(
@@ -82,8 +81,8 @@ namespace SmartFollowUp.API.Services
                     PatientEmail = patient.Email,
                     OperationType = newCase.OperationType ?? "",
                     OperationDate = newCase.OperationDate,
-                    Status = newCase.Status,
-                    CurrentRiskLevel = newCase.CurrentRiskLevel,
+                    Status = newCase.Status.ToString(),
+                    CurrentRiskLevel = newCase.CurrentRiskLevel.ToString(),
                     CreatedAt = newCase.CreatedAt
                 };
             }
@@ -95,9 +94,7 @@ namespace SmartFollowUp.API.Services
         }
 
         // Get All Cases for Doctor with Pagination
-        public async Task<PaginatedResponseDto<CaseResponseDto>> GetDoctorCasesAsync(
-            long doctorId,
-            PaginationRequestDto pagination)
+        public async Task<PaginatedResponseDto<CaseResponseDto>> GetDoctorCasesAsync(long doctorId, PaginationRequestDto pagination)
         {
             var query = _context.Cases
                 .Where(c => c.DoctorId == doctorId)
@@ -116,8 +113,8 @@ namespace SmartFollowUp.API.Services
                     PatientEmail = c.Patient.Email,
                     OperationType = c.OperationType ?? "",
                     OperationDate = c.OperationDate,
-                    Status = c.Status,
-                    CurrentRiskLevel = c.CurrentRiskLevel,
+                    Status = c.Status.ToString(),
+                    CurrentRiskLevel = c.CurrentRiskLevel.ToString(),
                     CreatedAt = c.CreatedAt
                 })
                 .ToListAsync();
@@ -141,8 +138,7 @@ namespace SmartFollowUp.API.Services
                 .Include(c => c.Patient)
                 .FirstOrDefaultAsync(c => c.Id == caseId && c.DoctorId == doctorId);
 
-            if (c == null)
-                return null;
+            if (c == null) return null;
 
             return new CaseResponseDto
             {
@@ -151,8 +147,8 @@ namespace SmartFollowUp.API.Services
                 PatientEmail = c.Patient.Email,
                 OperationType = c.OperationType ?? "",
                 OperationDate = c.OperationDate,
-                Status = c.Status,
-                CurrentRiskLevel = c.CurrentRiskLevel,
+                Status = c.Status.ToString(),
+                CurrentRiskLevel = c.CurrentRiskLevel.ToString(),
                 CreatedAt = c.CreatedAt
             };
         }
@@ -163,12 +159,10 @@ namespace SmartFollowUp.API.Services
             var c = await _context.Cases
                 .FirstOrDefaultAsync(c => c.Id == caseId && c.DoctorId == doctorId);
 
-            if (c == null)
-                return false;
+            if (c == null) return false;
 
-            c.Status = "closed";
+            c.Status = CaseStatus.Closed;
             c.ClosedAt = DateTime.UtcNow;
-
             await _context.SaveChangesAsync();
 
             return true;
@@ -178,12 +172,9 @@ namespace SmartFollowUp.API.Services
         public async Task<List<CaseResponseDto>> SearchPatientsAsync(string keyword, long doctorId)
         {
             return await _context.Cases
-                .Where(c =>
-                    c.DoctorId == doctorId &&
-                    (
-                        c.Patient.Name.Contains(keyword) ||
-                        c.Patient.Phone!.Contains(keyword)
-                    ))
+                .Where(c => c.DoctorId == doctorId &&
+                    (c.Patient.Name.Contains(keyword) ||
+                     c.Patient.Phone!.Contains(keyword)))
                 .Include(c => c.Patient)
                 .Select(c => new CaseResponseDto
                 {
@@ -192,8 +183,8 @@ namespace SmartFollowUp.API.Services
                     PatientEmail = c.Patient.Email,
                     OperationType = c.OperationType ?? "",
                     OperationDate = c.OperationDate,
-                    Status = c.Status,
-                    CurrentRiskLevel = c.CurrentRiskLevel,
+                    Status = c.Status.ToString(),
+                    CurrentRiskLevel = c.CurrentRiskLevel.ToString(),
                     CreatedAt = c.CreatedAt
                 })
                 .ToListAsync();
@@ -205,12 +196,10 @@ namespace SmartFollowUp.API.Services
             var c = await _context.Cases
                 .FirstOrDefaultAsync(c => c.Id == caseId && c.DoctorId == doctorId);
 
-            if (c == null)
-                return false;
+            if (c == null) return false;
 
             c.IsDeleted = true;
             c.DeletedAt = DateTime.UtcNow;
-
             await _context.SaveChangesAsync();
 
             return true;

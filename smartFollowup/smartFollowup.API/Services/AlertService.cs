@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SmartFollowUp.API.Data;
 using SmartFollowUp.API.DTOs;
+using SmartFollowUp.API.Enums;
 
 namespace SmartFollowUp.API.Services
 {
@@ -25,9 +26,9 @@ namespace SmartFollowUp.API.Services
                     Id = a.Id,
                     CaseId = a.CaseId,
                     PatientName = a.Case.Patient.Name,
-                    AlertType = a.AlertType,
-                    Priority = a.Priority,
-                    Status = a.Status,
+                    AlertType = a.AlertType.ToString(),
+                    Priority = a.Priority.ToString(),
+                    Status = a.Status.ToString(),
                     TriggeredAt = a.TriggeredAt,
                     HandledAt = a.HandledAt
                 })
@@ -44,7 +45,7 @@ namespace SmartFollowUp.API.Services
 
             if (alert == null) return false;
 
-            alert.Status = "handled";
+            alert.Status = AlertStatus.Handled;
             alert.HandledAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
@@ -56,7 +57,7 @@ namespace SmartFollowUp.API.Services
         {
             return await _context.Alerts
                 .Include(a => a.Case)
-                .Where(a => a.Case.DoctorId == doctorId && a.Status == "open")
+                .Where(a => a.Case.DoctorId == doctorId && a.Status == AlertStatus.Open)
                 .CountAsync();
         }
     }

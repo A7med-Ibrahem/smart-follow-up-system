@@ -1,4 +1,6 @@
-﻿namespace SmartFollowUp.API.Models
+﻿using SmartFollowUp.API.Enums;
+
+namespace SmartFollowUp.API.Models
 {
     public class User
     {
@@ -6,7 +8,7 @@
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
-        public string Role { get; set; } = string.Empty; // doctor, patient, admin
+        public UserRole Role { get; set; } = UserRole.Patient;
         public string? Phone { get; set; }
         public bool IsActive { get; set; } = false;
         public string? ActivationToken { get; set; }
