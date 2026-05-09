@@ -22,7 +22,7 @@ namespace SmartFollowUp.API.Controllers
 
         // POST api/cases
         [HttpPost]
-        [Authorize(Roles = "doctor")]
+        [Authorize(Roles = "Doctor")]
         public async Task<IActionResult> CreateCase(CreateCaseRequestDto request)
         {
             var doctorId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
@@ -39,7 +39,7 @@ namespace SmartFollowUp.API.Controllers
                 newValues: $"Patient: {request.PatientName}, Operation: {request.OperationType}",
                 userId: doctorId,
                 userName: doctorName,
-                userRole: "doctor",
+                userRole: "Doctor",
                 ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString()
             );
 
@@ -48,7 +48,7 @@ namespace SmartFollowUp.API.Controllers
 
         // GET api/cases?page=1&pageSize=10
         [HttpGet]
-        [Authorize(Roles = "doctor")]
+        [Authorize(Roles = "Doctor")]
         public async Task<IActionResult> GetDoctorCases([FromQuery] PaginationRequestDto pagination)
         {
             var doctorId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
@@ -58,7 +58,7 @@ namespace SmartFollowUp.API.Controllers
 
         // GET api/cases/{id}
         [HttpGet("{id}")]
-        [Authorize(Roles = "doctor")]
+        [Authorize(Roles = "Doctor")]
         public async Task<IActionResult> GetCaseById(long id)
         {
             var doctorId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
@@ -71,7 +71,7 @@ namespace SmartFollowUp.API.Controllers
 
         // PUT api/cases/{id}/close
         [HttpPut("{id}/close")]
-        [Authorize(Roles = "doctor")]
+        [Authorize(Roles = "Doctor")]
         public async Task<IActionResult> CloseCase(long id)
         {
             var doctorId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
@@ -87,7 +87,7 @@ namespace SmartFollowUp.API.Controllers
                 entityId: id.ToString(),
                 userId: doctorId,
                 userName: doctorName,
-                userRole: "doctor",
+                userRole: "Doctor",
                 ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString()
             );
 
@@ -96,7 +96,7 @@ namespace SmartFollowUp.API.Controllers
 
         // GET api/cases/search?keyword=ahmed
         [HttpGet("search")]
-        [Authorize(Roles = "doctor")]
+        [Authorize(Roles = "Doctor")]
         public async Task<IActionResult> SearchPatients([FromQuery] string keyword)
         {
             var doctorId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
@@ -106,7 +106,7 @@ namespace SmartFollowUp.API.Controllers
 
         // DELETE api/cases/{id}
         [HttpDelete("{id}")]
-        [Authorize(Roles = "doctor")]
+        [Authorize(Roles = "Doctor")]
         public async Task<IActionResult> DeleteCase(long id)
         {
             var doctorId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);

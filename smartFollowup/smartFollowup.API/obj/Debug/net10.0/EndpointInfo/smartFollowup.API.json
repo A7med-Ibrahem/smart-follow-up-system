@@ -114,7 +114,7 @@
         }
       }
     },
-    "/api/Admin/analytics": {
+    "/api/Admin/Analytics": {
       "get": {
         "tags": [
           "Admin"
@@ -549,7 +549,7 @@
         }
       }
     },
-    "/api/Doctor/profile": {
+    "/api/Doctor/Profile": {
       "get": {
         "tags": [
           "Doctor"
@@ -721,7 +721,7 @@
         }
       }
     },
-    "/api/Patient/profile": {
+    "/api/Patient/Profile": {
       "get": {
         "tags": [
           "Patient"

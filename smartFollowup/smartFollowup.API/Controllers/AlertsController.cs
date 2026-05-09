@@ -19,7 +19,7 @@ namespace SmartFollowUp.API.Controllers
 
         // GET api/alerts
         [HttpGet]
-        [Authorize(Roles = "doctor")]
+        [Authorize(Roles = "Doctor")]
         public async Task<IActionResult> GetDoctorAlerts()
         {
             var doctorId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
@@ -29,7 +29,7 @@ namespace SmartFollowUp.API.Controllers
 
         // PUT api/alerts/{id}/handle
         [HttpPut("{id}/handle")]
-        [Authorize(Roles = "doctor")]
+        [Authorize(Roles = "Doctor")]
         public async Task<IActionResult> HandleAlert(long id)
         {
             var doctorId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
@@ -42,7 +42,7 @@ namespace SmartFollowUp.API.Controllers
 
         // GET api/alerts/count
         [HttpGet("count")]
-        [Authorize(Roles = "doctor")]
+        [Authorize(Roles = "Doctor")]
         public async Task<IActionResult> GetOpenAlertsCount()
         {
             var doctorId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);

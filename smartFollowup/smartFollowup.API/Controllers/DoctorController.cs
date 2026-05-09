@@ -8,7 +8,7 @@ namespace SmartFollowUp.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "doctor")]
+    [Authorize(Roles = "Doctor")]
     public class DoctorController : ControllerBase
     {
         private readonly DoctorService _doctorService;
@@ -19,7 +19,7 @@ namespace SmartFollowUp.API.Controllers
         }
 
         // GET api/doctor/profile
-        [HttpGet("profile")]
+        [HttpGet("Profile")]
         public async Task<IActionResult> GetProfile()
         {
             var doctorId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
@@ -31,7 +31,7 @@ namespace SmartFollowUp.API.Controllers
         }
 
         // PUT api/doctor/profile
-        [HttpPut("profile")]
+        [HttpPut("Profile")]
         public async Task<IActionResult> UpdateProfile(UpdateDoctorProfileRequestDto request)
         {
             var doctorId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);

@@ -8,7 +8,7 @@ namespace SmartFollowUp.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
     {
         private readonly AdminService _adminService;
@@ -43,7 +43,7 @@ namespace SmartFollowUp.API.Controllers
                 entityId: id.ToString(),
                 userId: adminId,
                 userName: "Admin",
-                userRole: "admin",
+                userRole: "Admin",
                 ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString()
             );
 
@@ -66,7 +66,7 @@ namespace SmartFollowUp.API.Controllers
                 newValues: $"Reason: {request.RejectionReason}",
                 userId: adminId,
                 userName: "Admin",
-                userRole: "admin",
+                userRole: "Admin",
                 ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString()
             );
 
@@ -85,7 +85,7 @@ namespace SmartFollowUp.API.Controllers
         }
 
         // GET api/admin/analytics
-        [HttpGet("analytics")]
+        [HttpGet("Analytics")]
         public async Task<IActionResult> GetAnalytics()
         {
             var result = await _adminService.GetAnalyticsAsync();

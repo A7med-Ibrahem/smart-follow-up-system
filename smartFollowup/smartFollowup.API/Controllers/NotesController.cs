@@ -20,7 +20,7 @@ namespace SmartFollowUp.API.Controllers
 
         // POST api/notes
         [HttpPost]
-        [Authorize(Roles = "doctor")]
+        [Authorize(Roles = "Doctor")]
         public async Task<IActionResult> AddNote(CreateNoteRequestDto request)
         {
             var doctorId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
@@ -33,7 +33,7 @@ namespace SmartFollowUp.API.Controllers
 
         // GET api/notes/case/{caseId}
         [HttpGet("case/{caseId}")]
-        [Authorize(Roles = "doctor")]
+        [Authorize(Roles = "Doctor")]
         public async Task<IActionResult> GetCaseNotes(long caseId)
         {
             var result = await _noteService.GetCaseNotesAsync(caseId);

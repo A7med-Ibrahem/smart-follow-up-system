@@ -22,7 +22,7 @@ namespace SmartFollowUp.API.Controllers
 
         // POST api/prescriptions
         [HttpPost]
-        [Authorize(Roles = "doctor")]
+        [Authorize(Roles = "Doctor")]
         public async Task<IActionResult> CreatePrescription(CreatePrescriptionRequestDto request)
         {
             var doctorId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
@@ -39,7 +39,7 @@ namespace SmartFollowUp.API.Controllers
                 newValues: $"CaseId: {request.CaseId}, Medications: {request.Medications.Count}",
                 userId: doctorId,
                 userName: User.FindFirst(ClaimTypes.Name)?.Value ?? "Doctor",
-                userRole: "doctor",
+                userRole: "Doctor",
                 ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString()
             );
 
@@ -48,7 +48,7 @@ namespace SmartFollowUp.API.Controllers
 
         // GET api/prescriptions/case/{caseId}
         [HttpGet("case/{caseId}")]
-        [Authorize(Roles = "doctor,patient")]
+        [Authorize(Roles = "Doctor,Patient")]
         public async Task<IActionResult> GetCasePrescriptions(long caseId)
         {
             var result = await _prescriptionService.GetCasePrescriptionsAsync(caseId);
@@ -57,7 +57,7 @@ namespace SmartFollowUp.API.Controllers
 
         // POST api/prescriptions/medications/{medicationId}/confirm
         [HttpPost("medications/{medicationId}/confirm")]
-        [Authorize(Roles = "patient")]
+        [Authorize(Roles = "Patient")]
         public async Task<IActionResult> ConfirmMedicationTaken(long medicationId)
         {
             var patientId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
@@ -70,7 +70,7 @@ namespace SmartFollowUp.API.Controllers
 
         // PUT api/prescriptions/{id}
         [HttpPut("{id}")]
-        [Authorize(Roles = "doctor")]
+        [Authorize(Roles = "Doctor")]
         public async Task<IActionResult> UpdatePrescription(long id, CreatePrescriptionRequestDto request)
         {
             var doctorId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
@@ -87,7 +87,7 @@ namespace SmartFollowUp.API.Controllers
                 newValues: $"Updated medications: {request.Medications.Count}",
                 userId: doctorId,
                 userName: User.FindFirst(ClaimTypes.Name)?.Value ?? "Doctor",
-                userRole: "doctor",
+                userRole: "Doctor",
                 ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString()
             );
 

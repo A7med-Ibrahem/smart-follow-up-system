@@ -20,7 +20,7 @@ namespace SmartFollowUp.API.Controllers
 
         // POST api/reports
         [HttpPost]
-        [Authorize(Roles = "patient")]
+        [Authorize(Roles = "Patient")]
         public async Task<IActionResult> CreateReport(CreateReportRequestDto request)
         {
             var patientId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
@@ -33,7 +33,7 @@ namespace SmartFollowUp.API.Controllers
 
         // GET api/reports/case/{caseId}?page=1&pageSize=10
         [HttpGet("case/{caseId}")]
-        [Authorize(Roles = "doctor")]
+        [Authorize(Roles = "Doctor")]
         public async Task<IActionResult> GetCaseReports(long caseId, [FromQuery] PaginationRequestDto pagination)
         {
             var result = await _reportService.GetCaseReportsAsync(caseId, pagination);

@@ -1,18 +1,18 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SmartFollowUp.API.Data;
-using SmartFollowUp.API.Services;
-using System.Text;
 using SmartFollowUp.API.Hubs;
-using Microsoft.AspNetCore.RateLimiting;
-using System.Threading.RateLimiting;
-using FluentValidation;
-using FluentValidation.AspNetCore;
-using SmartFollowUp.API.Validators;
 using SmartFollowUp.API.Interfaces;
+using SmartFollowUp.API.Services;
+using SmartFollowUp.API.Validators;
+using System.Text;
+using System.Threading.RateLimiting;
 
 namespace smartFollowup.API
 {

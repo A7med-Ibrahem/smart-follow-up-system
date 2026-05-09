@@ -2,7 +2,7 @@
   {
     "ContainingType": "SmartFollowUp.API.Controllers.AdminController",
     "Method": "GetAnalytics",
-    "RelativePath": "api/Admin/analytics",
+    "RelativePath": "api/Admin/Analytics",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -340,7 +340,7 @@
   {
     "ContainingType": "SmartFollowUp.API.Controllers.DoctorController",
     "Method": "GetProfile",
-    "RelativePath": "api/Doctor/profile",
+    "RelativePath": "api/Doctor/Profile",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -350,7 +350,7 @@
   {
     "ContainingType": "SmartFollowUp.API.Controllers.DoctorController",
     "Method": "UpdateProfile",
-    "RelativePath": "api/Doctor/profile",
+    "RelativePath": "api/Doctor/Profile",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -455,7 +455,7 @@
   {
     "ContainingType": "SmartFollowUp.API.Controllers.PatientController",
     "Method": "GetProfile",
-    "RelativePath": "api/Patient/profile",
+    "RelativePath": "api/Patient/Profile",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -465,7 +465,7 @@
   {
     "ContainingType": "SmartFollowUp.API.Controllers.PatientController",
     "Method": "UpdateProfile",
-    "RelativePath": "api/Patient/profile",
+    "RelativePath": "api/Patient/Profile",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,

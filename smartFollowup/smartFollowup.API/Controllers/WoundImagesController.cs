@@ -20,7 +20,7 @@ namespace SmartFollowUp.API.Controllers
 
         // POST api/woundimages/upload/{reportId}
         [HttpPost("upload/{reportId}")]
-        [Authorize(Roles = "patient")]
+        [Authorize(Roles = "Patient")]
         [EnableRateLimiting("upload")]
         public async Task<IActionResult> UploadImage(long reportId, IFormFile file)
         {
@@ -35,7 +35,7 @@ namespace SmartFollowUp.API.Controllers
 
         // GET api/woundimages/case/{caseId}
         [HttpGet("case/{caseId}")]
-        [Authorize(Roles = "doctor,patient")]
+        [Authorize(Roles = "Doctor,Patient")]
         public async Task<IActionResult> GetCaseImages(long caseId)
         {
             var result = await _woundImageService.GetCaseImagesAsync(caseId);
