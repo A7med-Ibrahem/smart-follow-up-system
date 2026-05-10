@@ -50,7 +50,7 @@ namespace smartFollowup.API
             builder.Services.AddFluentValidationAutoValidation();
             builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
+            builder.Services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
 
             // Rate Limiting
             builder.Services.AddRateLimiter(options =>
