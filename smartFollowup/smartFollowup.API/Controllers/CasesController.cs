@@ -12,12 +12,10 @@ namespace SmartFollowUp.API.Controllers
     public class CasesController : ControllerBase
     {
         private readonly CaseService _caseService;
-        private readonly AuditService _auditService;
 
-        public CasesController(CaseService caseService, AuditService auditService)
+        public CasesController(CaseService caseService)
         {
             _caseService = caseService;
-            _auditService = auditService;
         }
 
         // POST api/cases
@@ -32,16 +30,7 @@ namespace SmartFollowUp.API.Controllers
             if (result == null)
                 return BadRequest(new { message = "Failed to create case" });
 
-            await _auditService.LogAsync(
-                action: "CREATE",
-                entityName: "Case",
-                entityId: result.Id.ToString(),
-                newValues: $"Patient: {request.PatientName}, Operation: {request.OperationType}",
-                userId: doctorId,
-                userName: doctorName,
-                userRole: "Doctor",
-                ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString()
-            );
+            
 
             return Ok(result);
         }
@@ -81,15 +70,7 @@ namespace SmartFollowUp.API.Controllers
             if (!success)
                 return NotFound(new { message = "Case not found" });
 
-            await _auditService.LogAsync(
-                action: "CLOSE",
-                entityName: "Case",
-                entityId: id.ToString(),
-                userId: doctorId,
-                userName: doctorName,
-                userRole: "Doctor",
-                ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString()
-            );
+            
 
             return Ok(new { message = "Case closed successfully" });
         }

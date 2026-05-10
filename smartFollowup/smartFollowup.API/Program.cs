@@ -23,8 +23,11 @@ namespace smartFollowup.API
             var builder = WebApplication.CreateBuilder(args);
 
             // Database
-            builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddDbContext<AppDbContext>((sp, options) =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+                options.AddInterceptors(sp.GetRequiredService<AuditInterceptor>());
+            });
 
             // Services
             builder.Services.AddScoped<AuthService>();
@@ -41,6 +44,8 @@ namespace smartFollowup.API
             builder.Services.AddScoped<EmailService>();
             builder.Services.AddScoped<EscalationService>();
             builder.Services.AddScoped<AuditService>();
+            builder.Services.AddHttpContextAccessor();
+            builder.Services.AddScoped<AuditInterceptor>();
             builder.Services.AddScoped<DoctorService>();
             builder.Services.AddFluentValidationAutoValidation();
             builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
