@@ -190,22 +190,6 @@
   },
   {
     "ContainingType": "SmartFollowUp.API.Controllers.AuthController",
-    "Method": "RegisterPatient",
-    "RelativePath": "api/Auth/register-patient",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "request",
-        "Type": "SmartFollowUp.API.DTOs.RegisterPatientRequestDto",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "SmartFollowUp.API.Controllers.AuthController",
     "Method": "RequestDoctor",
     "RelativePath": "api/Auth/request-doctor",
     "HttpMethod": "POST",

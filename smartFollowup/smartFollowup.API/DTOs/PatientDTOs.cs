@@ -3,6 +3,9 @@
     public class UpdatePatientProfileRequestDto
     {
         public string? Phone { get; set; }
+        public int? Age { get; set; }
+        public string? Gender { get; set; }
+        public string? ChronicDiseases { get; set; }
         public string? Allergies { get; set; }
         public string? CurrentMedications { get; set; }
     }

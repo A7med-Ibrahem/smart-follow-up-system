@@ -51,55 +51,7 @@ namespace SmartFollowUp.API.Services
             };
         }
 
-        // Register Patient
-        public async Task<AuthResponseDto?> RegisterPatientAsync(RegisterPatientRequestDto request)
-        {
-            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
-                return null;
-
-            var user = new User
-            {
-                Name = request.Name,
-                Email = request.Email,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-                Role = UserRole.Patient,
-                Phone = request.Phone,
-                IsActive = true
-            };
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            var patientProfile = new PatientProfile
-            {
-                UserId = user.Id,
-                Age = request.Age,
-                Gender = request.Gender == "male" ? Gender.Male : Gender.Female,
-                ChronicDiseases = request.ChronicDiseases,
-                Allergies = request.Allergies,
-                CurrentMedications = request.CurrentMedications
-            };
-
-            _context.PatientProfiles.Add(patientProfile);
-            await _context.SaveChangesAsync();
-
-            var refreshToken = GenerateRefreshToken();
-            user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
-            await _context.SaveChangesAsync();
-
-            return new AuthResponseDto
-            {
-                Id = user.Id,
-                Name = user.Name,
-                Email = user.Email,
-                Role = user.Role.ToString(),
-                Token = GenerateToken(user),
-                RefreshToken = refreshToken,
-                RefreshTokenExpiry = user.RefreshTokenExpiry.Value
-            };
-        }
-
+        
         // Submit Doctor Request
         public async Task<bool> SubmitDoctorRequestAsync(DoctorRequestDto request)
         {

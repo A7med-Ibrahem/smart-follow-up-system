@@ -17,38 +17,7 @@ namespace SmartFollowUp.API.Validators
         }
     }
 
-    public class RegisterPatientRequestValidator : AbstractValidator<RegisterPatientRequestDto>
-    {
-        public RegisterPatientRequestValidator()
-        {
-            RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("Name is required")
-                .MinimumLength(3).WithMessage("Name must be at least 3 characters");
-
-            RuleFor(x => x.Email)
-                .NotEmpty().WithMessage("Email is required")
-                .EmailAddress().WithMessage("Invalid email format");
-
-            RuleFor(x => x.Password)
-                .NotEmpty().WithMessage("Password is required")
-                .MinimumLength(8).WithMessage("Password must be at least 8 characters")
-                .Matches(@"[A-Z]").WithMessage("Password must contain at least one uppercase letter")
-                .Matches(@"[a-z]").WithMessage("Password must contain at least one lowercase letter")
-                .Matches(@"[0-9]").WithMessage("Password must contain at least one number");
-
-            RuleFor(x => x.Phone)
-                .NotEmpty().WithMessage("Phone is required");
-
-            RuleFor(x => x.Age)
-                .GreaterThan(0).WithMessage("Age must be greater than 0")
-                .LessThan(120).WithMessage("Invalid age");
-
-            RuleFor(x => x.Gender)
-                .NotEmpty().WithMessage("Gender is required")
-                .Must(g => g == "male" || g == "female")
-                .WithMessage("Gender must be male or female");
-        }
-    }
+   
 
     public class ForgotPasswordRequestValidator : AbstractValidator<ForgotPasswordRequestDto>
     {

@@ -48,6 +48,13 @@ namespace SmartFollowUp.API.Services
 
                     _context.Users.Add(patient);
                     await _unitOfWork.SaveChangesAsync();
+
+                    // عمل PatientProfile للمريض الجديد
+                    var patientProfile = new PatientProfile
+                    {
+                        UserId = patient.Id
+                    };
+                    _context.PatientProfiles.Add(patientProfile);
                 }
 
                 var newCase = new Case

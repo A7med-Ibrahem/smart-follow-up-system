@@ -57,6 +57,15 @@ namespace SmartFollowUp.API.Services
 
             if (user.PatientProfile != null)
             {
+                if (request.Age != null)
+                    user.PatientProfile.Age = request.Age;
+
+                if (request.Gender != null)
+                    user.PatientProfile.Gender = request.Gender == "male" ? Gender.Male : Gender.Female;
+
+                if (request.ChronicDiseases != null)
+                    user.PatientProfile.ChronicDiseases = request.ChronicDiseases;
+
                 if (request.Allergies != null)
                     user.PatientProfile.Allergies = request.Allergies;
 

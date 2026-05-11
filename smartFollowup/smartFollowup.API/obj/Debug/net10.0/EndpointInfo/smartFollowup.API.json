@@ -204,37 +204,6 @@
         }
       }
     },
-    "/api/Auth/register-patient": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterPatientRequestDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterPatientRequestDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterPatientRequestDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
     "/api/Auth/forgot-password": {
       "post": {
         "tags": [
@@ -1218,48 +1187,6 @@
         },
         "additionalProperties": false
       },
-      "RegisterPatientRequestDto": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "email": {
-            "type": "string",
-            "nullable": true
-          },
-          "password": {
-            "type": "string",
-            "nullable": true
-          },
-          "phone": {
-            "type": "string",
-            "nullable": true
-          },
-          "age": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "gender": {
-            "type": "string",
-            "nullable": true
-          },
-          "chronicDiseases": {
-            "type": "string",
-            "nullable": true
-          },
-          "allergies": {
-            "type": "string",
-            "nullable": true
-          },
-          "currentMedications": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "RejectDoctorRequestDto": {
         "type": "object",
         "properties": {
@@ -1310,6 +1237,19 @@
         "type": "object",
         "properties": {
           "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "age": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "gender": {
+            "type": "string",
+            "nullable": true
+          },
+          "chronicDiseases": {
             "type": "string",
             "nullable": true
           },
