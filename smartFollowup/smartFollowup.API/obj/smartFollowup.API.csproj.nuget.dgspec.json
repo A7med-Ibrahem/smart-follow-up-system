@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\project API\\smartFollowup\\smartFollowup.API\\smartFollowup.API.csproj": {}
+    "D:\\smart-follow-up-system-main\\smart-follow-up-system\\smartFollowup\\smartFollowup.API\\smartFollowup.API.csproj": {}
   },
   "projects": {
-    "D:\\project API\\smartFollowup\\smartFollowup.API\\smartFollowup.API.csproj": {
+    "D:\\smart-follow-up-system-main\\smart-follow-up-system\\smartFollowup\\smartFollowup.API\\smartFollowup.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\project API\\smartFollowup\\smartFollowup.API\\smartFollowup.API.csproj",
+        "projectUniqueName": "D:\\smart-follow-up-system-main\\smart-follow-up-system\\smartFollowup\\smartFollowup.API\\smartFollowup.API.csproj",
         "projectName": "smartFollowup.API",
-        "projectPath": "D:\\project API\\smartFollowup\\smartFollowup.API\\smartFollowup.API.csproj",
+        "projectPath": "D:\\smart-follow-up-system-main\\smart-follow-up-system\\smartFollowup\\smartFollowup.API\\smartFollowup.API.csproj",
         "packagesPath": "C:\\Users\\Elnour Tech\\.nuget\\packages\\",
-        "outputPath": "D:\\project API\\smartFollowup\\smartFollowup.API\\obj\\",
+        "outputPath": "D:\\smart-follow-up-system-main\\smart-follow-up-system\\smartFollowup\\smartFollowup.API\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -30,7 +30,6 @@
         },
         "frameworks": {
           "net10.0": {
-            "framework": "net10.0",
             "targetAlias": "net10.0",
             "projectReferences": {}
           }
@@ -49,7 +48,6 @@
       },
       "frameworks": {
         "net10.0": {
-          "framework": "net10.0",
           "targetAlias": "net10.0",
           "dependencies": {
             "BCrypt.Net-Next": {

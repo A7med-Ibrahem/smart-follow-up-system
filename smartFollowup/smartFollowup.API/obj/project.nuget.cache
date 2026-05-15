@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "36XALBQlKl0=",
+  "dgSpecHash": "vnGrCa3rMCU=",
   "success": true,
-  "projectFilePath": "D:\\project API\\smartFollowup\\smartFollowup.API\\smartFollowup.API.csproj",
+  "projectFilePath": "D:\\smart-follow-up-system-main\\smart-follow-up-system\\smartFollowup\\smartFollowup.API\\smartFollowup.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Elnour Tech\\.nuget\\packages\\azure.core\\1.47.1\\azure.core.1.47.1.nupkg.sha512",
     "C:\\Users\\Elnour Tech\\.nuget\\packages\\azure.identity\\1.14.2\\azure.identity.1.14.2.nupkg.sha512",
