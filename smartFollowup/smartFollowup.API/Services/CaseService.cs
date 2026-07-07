@@ -152,6 +152,7 @@ namespace SmartFollowUp.API.Services
                 Id = c.Id,
                 PatientName = c.Patient.Name,
                 PatientEmail = c.Patient.Email,
+                
                 OperationType = c.OperationType ?? "",
                 OperationDate = c.OperationDate,
                 Status = c.Status.ToString(),

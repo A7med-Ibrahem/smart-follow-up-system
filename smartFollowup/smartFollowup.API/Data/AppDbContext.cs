@@ -27,87 +27,20 @@ namespace SmartFollowUp.API.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // User → Cases (as Doctor)
-            modelBuilder.Entity<Case>()
-                .HasOne(c => c.Doctor)
-                .WithMany(u => u.DoctorCases)
-                .HasForeignKey(c => c.DoctorId)
-                .OnDelete(DeleteBehavior.Restrict);
+            base.OnModelCreating(modelBuilder);
 
-            // User → Cases (as Patient)
-            modelBuilder.Entity<Case>()
-                .HasOne(c => c.Patient)
-                .WithMany(u => u.PatientCases)
-                .HasForeignKey(c => c.PatientId)
-                .OnDelete(DeleteBehavior.Restrict);
+            // Every entity now has its own IEntityTypeConfiguration<T> file
+            // under Data/Configurations/. This picks all of them up.
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
-            // User → DoctorProfile
-            modelBuilder.Entity<DoctorProfile>()
-                .HasOne(d => d.User)
-                .WithOne(u => u.DoctorProfile)
-                .HasForeignKey<DoctorProfile>(d => d.UserId);
-
-            // User → PatientProfile
-            modelBuilder.Entity<PatientProfile>()
-                .HasOne(p => p.User)
-                .WithOne(u => u.PatientProfile)
-                .HasForeignKey<PatientProfile>(p => p.UserId);
-
-            // DailyReport → AiAnalysis
-            modelBuilder.Entity<AiAnalysis>()
-                .HasOne(a => a.DailyReport)
-                .WithOne(r => r.AiAnalysis)
-                .HasForeignKey<AiAnalysis>(a => a.ReportId);
-
-            // Alert → Case
-            modelBuilder.Entity<Alert>()
-                .HasOne(a => a.Case)
-                .WithMany(c => c.Alerts)
-                .HasForeignKey(a => a.CaseId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Alert → DailyReport
-            modelBuilder.Entity<Alert>()
-                .HasOne(a => a.DailyReport)
-                .WithMany(r => r.Alerts)
-                .HasForeignKey(a => a.ReportId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // WoundImage → DailyReport
-            modelBuilder.Entity<WoundImage>()
-                .HasOne(w => w.DailyReport)
-                .WithMany(r => r.WoundImages)
-                .HasForeignKey(w => w.ReportId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // WoundImage → Case
-            modelBuilder.Entity<WoundImage>()
-                .HasOne(w => w.Case)
-                .WithMany(c => c.WoundImages)
-                .HasForeignKey(w => w.CaseId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Email unique index
-            modelBuilder.Entity<User>()
-                .HasIndex(u => u.Email)
-                .IsUnique();
-
-            // Disable cascade delete globally for everything else
+            // Safety net: force Restrict on any relationship a future entity
+            // might add without an explicit configuration, so cascade deletes
+            // never accidentally turn on.
             foreach (var relationship in modelBuilder.Model.GetEntityTypes()
                 .SelectMany(e => e.GetForeignKeys()))
             {
                 relationship.DeleteBehavior = DeleteBehavior.Restrict;
             }
-
-            // Global Soft Delete Filters
-            modelBuilder.Entity<Case>()
-                .HasQueryFilter(c => !c.IsDeleted);
-
-            modelBuilder.Entity<User>()
-                .HasQueryFilter(u => !u.IsDeleted);
-
-            modelBuilder.Entity<Prescription>()
-                .HasQueryFilter(p => !p.IsDeleted);
         }
     }
 }
