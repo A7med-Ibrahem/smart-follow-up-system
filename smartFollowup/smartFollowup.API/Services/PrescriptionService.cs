@@ -53,9 +53,15 @@ namespace SmartFollowUp.API.Services
             return await GetPrescriptionByIdAsync(prescription.Id);
         }
 
-        // Get Prescriptions for Case
-        public async Task<List<PrescriptionResponseDto>> GetCasePrescriptionsAsync(long caseId)
+        // Get Prescriptions for Case (ownership enforced: caller must be the case's doctor or its patient)
+        public async Task<List<PrescriptionResponseDto>?> GetCasePrescriptionsAsync(long caseId, long requestingUserId)
         {
+            var existingCase = await _context.Cases
+                .FirstOrDefaultAsync(c => c.Id == caseId &&
+                    (c.DoctorId == requestingUserId || c.PatientId == requestingUserId));
+
+            if (existingCase == null) return null;
+
             return await _context.Prescriptions
                 .Where(p => p.CaseId == caseId)
                 .Include(p => p.Medications)

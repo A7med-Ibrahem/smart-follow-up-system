@@ -39,7 +39,8 @@ namespace SmartFollowUp.API.Services
                 ChronicDiseases = user.PatientProfile?.ChronicDiseases,
                 Allergies = user.PatientProfile?.Allergies,
                 CurrentMedications = user.PatientProfile?.CurrentMedications,
-                RiskLevel = latestCase?.CurrentRiskLevel.ToString() ?? RiskLevel.Stable.ToString()
+                RiskLevel = latestCase?.CurrentRiskLevel.ToString() ?? RiskLevel.Stable.ToString(),
+                CaseId = latestCase?.Id
             };
         }
 

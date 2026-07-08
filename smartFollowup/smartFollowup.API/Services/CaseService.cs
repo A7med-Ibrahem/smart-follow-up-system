@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Hangfire;
+using Microsoft.EntityFrameworkCore;
 using SmartFollowUp.API.Data;
 using SmartFollowUp.API.DTOs;
 using SmartFollowUp.API.Enums;
@@ -10,14 +11,14 @@ namespace SmartFollowUp.API.Services
     public class CaseService
     {
         private readonly AppDbContext _context;
-        private readonly EmailService _emailService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IBackgroundJobClient _backgroundJobClient;
 
-        public CaseService(AppDbContext context, EmailService emailService, IUnitOfWork unitOfWork)
+        public CaseService(AppDbContext context, IUnitOfWork unitOfWork, IBackgroundJobClient backgroundJobClient)
         {
             _context = context;
-            _emailService = emailService;
             _unitOfWork = unitOfWork;
+            _backgroundJobClient = backgroundJobClient;
         }
 
         // Create Case
@@ -74,11 +75,11 @@ namespace SmartFollowUp.API.Services
 
                 if (isNewPatient)
                 {
-                    await _emailService.SendPatientActivationEmailAsync(
+                    _backgroundJobClient.Enqueue<EmailService>(x => x.SendPatientActivationEmailAsync(
                         patient.Email,
                         patient.Name,
                         "Smart@123"
-                    );
+                    ));
                 }
 
                 return new CaseResponseDto

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Hangfire;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SmartFollowUp.API.Data;
 using SmartFollowUp.API.DTOs;
@@ -14,13 +15,13 @@ namespace SmartFollowUp.API.Services
     {
         private readonly AppDbContext _context;
         private readonly IConfiguration _configuration;
-        private readonly EmailService _emailService;
+        private readonly IBackgroundJobClient _backgroundJobClient;
 
-        public AuthService(AppDbContext context, IConfiguration configuration, EmailService emailService)
+        public AuthService(AppDbContext context, IConfiguration configuration, IBackgroundJobClient backgroundJobClient)
         {
             _context = context;
             _configuration = configuration;
-            _emailService = emailService;
+            _backgroundJobClient = backgroundJobClient;
         }
 
         // Login
@@ -90,11 +91,11 @@ namespace SmartFollowUp.API.Services
             user.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
-            await _emailService.SendPasswordResetEmailAsync(
+            _backgroundJobClient.Enqueue<EmailService>(x => x.SendPasswordResetEmailAsync(
                 user.Email,
                 user.Name,
                 otpCode
-            );
+            ));
 
             return true;
         }

@@ -40,7 +40,12 @@ namespace SmartFollowUp.API.Controllers
         [Authorize(Roles = "Doctor,Patient")]
         public async Task<IActionResult> GetCasePrescriptions(long caseId)
         {
-            var result = await _prescriptionService.GetCasePrescriptionsAsync(caseId);
+            var userId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var result = await _prescriptionService.GetCasePrescriptionsAsync(caseId, userId);
+
+            if (result == null)
+                return NotFound(new { message = "Case not found or not accessible" });
+
             return Ok(result);
         }
 

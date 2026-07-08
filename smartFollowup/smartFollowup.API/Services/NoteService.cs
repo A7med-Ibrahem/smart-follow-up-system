@@ -8,10 +8,12 @@ namespace SmartFollowUp.API.Services
     public class NoteService
     {
         private readonly AppDbContext _context;
+        private readonly NotificationService _notificationService;
 
-        public NoteService(AppDbContext context)
+        public NoteService(AppDbContext context, NotificationService notificationService)
         {
             _context = context;
+            _notificationService = notificationService;
         }
 
         // Add Note
@@ -35,6 +37,14 @@ namespace SmartFollowUp.API.Services
 
             var doctor = await _context.Users.FindAsync(doctorId);
 
+            // Send Notification to Patient
+            await _notificationService.SendNotificationAsync(
+                existingCase.PatientId,
+                "instruction",
+                "New Note From Your Doctor 📝",
+                "Your doctor has added a new note to your case."
+            );
+
             return new NoteResponseDto
             {
                 Id = note.Id,
@@ -45,9 +55,15 @@ namespace SmartFollowUp.API.Services
             };
         }
 
-        // Get Notes for Case
-        public async Task<List<NoteResponseDto>> GetCaseNotesAsync(long caseId)
+        // Get Notes for Case (ownership enforced: caller must be the case's doctor or its patient)
+        public async Task<List<NoteResponseDto>?> GetCaseNotesAsync(long caseId, long requestingUserId)
         {
+            var existingCase = await _context.Cases
+                .FirstOrDefaultAsync(c => c.Id == caseId &&
+                    (c.DoctorId == requestingUserId || c.PatientId == requestingUserId));
+
+            if (existingCase == null) return null;
+
             return await _context.DoctorNotes
                 .Where(n => n.CaseId == caseId)
                 .Include(n => n.Doctor)

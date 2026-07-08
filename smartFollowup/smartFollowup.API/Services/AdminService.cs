@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Hangfire;
+using Microsoft.EntityFrameworkCore;
 using SmartFollowUp.API.Data;
 using SmartFollowUp.API.DTOs;
 using SmartFollowUp.API.Enums;
@@ -9,12 +10,12 @@ namespace SmartFollowUp.API.Services
     public class AdminService
     {
         private readonly AppDbContext _context;
-        private readonly EmailService _emailService;
+        private readonly IBackgroundJobClient _backgroundJobClient;
 
-        public AdminService(AppDbContext context, EmailService emailService)
+        public AdminService(AppDbContext context, IBackgroundJobClient backgroundJobClient)
         {
             _context = context;
-            _emailService = emailService;
+            _backgroundJobClient = backgroundJobClient;
         }
 
         // Get All Doctor Requests
@@ -75,7 +76,7 @@ namespace SmartFollowUp.API.Services
 
             await _context.SaveChangesAsync();
 
-            await _emailService.SendEmailAsync(
+            _backgroundJobClient.Enqueue<EmailService>(x => x.SendEmailAsync(
                 request.Email,
                 request.Name,
                 "Smart Follow Up — Account Approved ✅",
@@ -88,7 +89,7 @@ namespace SmartFollowUp.API.Services
                 <br>
                 <p>Smart Follow Up Team</p>
                 "
-            );
+            ));
 
             return true;
         }
@@ -107,7 +108,7 @@ namespace SmartFollowUp.API.Services
 
             await _context.SaveChangesAsync();
 
-            await _emailService.SendEmailAsync(
+            _backgroundJobClient.Enqueue<EmailService>(x => x.SendEmailAsync(
                 request.Email,
                 request.Name,
                 "Smart Follow Up — Application Update",
@@ -119,7 +120,7 @@ namespace SmartFollowUp.API.Services
                 <br>
                 <p>Smart Follow Up Team</p>
                 "
-            );
+            ));
 
             return true;
         }

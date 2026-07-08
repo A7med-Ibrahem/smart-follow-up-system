@@ -22,6 +22,7 @@
         public string? Allergies { get; set; }
         public string? CurrentMedications { get; set; }
         public string RiskLevel { get; set; } = string.Empty;
+        public long? CaseId { get; set; }
     }
 
     public class UpdateDoctorProfileRequestDto

@@ -1269,6 +1269,7 @@
       }
     }
   </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
 </head>
 
 <body>
@@ -1677,7 +1678,7 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <script>
-    const API = 'http://localhost:5290/api';
+    const API = 'https://followupsystem.runasp.net/api';
     let currentPage = 1;
     let pageSize = 10;
     let totalPages = 1;
@@ -1706,10 +1707,34 @@
       loadCases(1);
       loadAlertCount();
       loadNotifications();
+      connectNotificationHub();
       setGreeting();
       // Set today's date as max for operation date
       document.getElementById('operationDate').max = new Date().toISOString().split('T')[0];
     });
+
+    // ── LIVE NOTIFICATIONS (SignalR) ──
+    let hubConnection = null;
+    function connectNotificationHub() {
+      const token = localStorage.getItem('token');
+      if (!token || typeof signalR === 'undefined') return;
+
+      const hubUrl = API.replace(/\/api$/, '') + '/hubs/notifications';
+      hubConnection = new signalR.HubConnectionBuilder()
+        .withUrl(hubUrl, { accessTokenFactory: () => localStorage.getItem('token') })
+        .withAutomaticReconnect()
+        .build();
+
+      hubConnection.on('ReceiveNotification', (n) => {
+        showToast(n.title || 'New notification', 'success');
+        loadNotifications();
+        if (n.type === 'Alert') loadAlertCount();
+      });
+
+      hubConnection.start().catch(() => {
+        // Live updates unavailable; the notification panel still works via polling on next load/interaction.
+      });
+    }
 
     // ── AUTH ──
     function getHeaders() {

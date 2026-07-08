@@ -251,6 +251,7 @@ header{height:68px;background:var(--bg-card);border-bottom:1px solid var(--borde
 @media(max-width:480px){.stats-grid{grid-template-columns:1fr;}.form-row{grid-template-columns:1fr;}.avatar-name{display:none;}}
 @keyframes spin{to{transform:rotate(360deg);}}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
 </head>
 <body>
 
@@ -274,6 +275,10 @@ header{height:68px;background:var(--bg-card);border-bottom:1px solid var(--borde
     <a href="#" class="nav-link" onclick="setPage('medications',this)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
       <span>Medications</span>
+    </a>
+    <a href="#" class="nav-link" onclick="setPage('notes',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="10" y1="17" x2="8" y2="17"/></svg>
+      <span>Doctor Notes</span>
     </a>
     <a href="#" class="nav-link" onclick="setPage('profile',this)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
@@ -417,7 +422,7 @@ header{height:68px;background:var(--bg-card);border-bottom:1px solid var(--borde
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-const API = 'http://localhost:5290/api';
+const API = 'https://followupsystem.runasp.net/api';
 let currentPage = 'overview';
 let patientProfile = null;
 let caseData = null;
@@ -440,8 +445,31 @@ window.addEventListener('DOMContentLoaded', () => {
   initTheme();
   loadProfile();
   loadNotifications();
+  connectNotificationHub();
   renderPage('overview');
 });
+
+// ── LIVE NOTIFICATIONS (SignalR) ──
+let hubConnection = null;
+function connectNotificationHub() {
+  const token = localStorage.getItem('token');
+  if (!token || typeof signalR === 'undefined') return;
+
+  const hubUrl = API.replace(/\/api$/, '') + '/hubs/notifications';
+  hubConnection = new signalR.HubConnectionBuilder()
+    .withUrl(hubUrl, { accessTokenFactory: () => localStorage.getItem('token') })
+    .withAutomaticReconnect()
+    .build();
+
+  hubConnection.on('ReceiveNotification', (n) => {
+    showToast(n.title || 'New notification', 'success');
+    loadNotifications();
+  });
+
+  hubConnection.start().catch(() => {
+    // Live updates unavailable; the notification panel still works via polling on next load/interaction.
+  });
+}
 
 // ── AUTH ──
 function headers() { return {'Content-Type':'application/json','Authorization':`Bearer ${localStorage.getItem('token')}`}; }
@@ -486,7 +514,7 @@ async function loadCase() {
 function setPage(page, btn) {
   document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
   btn.classList.add('active');
-  const labels = {overview:'Overview',report:'Daily Report',medications:'Medications',profile:'My Profile'};
+  const labels = {overview:'Overview',report:'Daily Report',medications:'Medications',notes:'Doctor Notes',profile:'My Profile'};
   document.getElementById('pageLabel').textContent = labels[page]||page;
   renderPage(page);
 }
@@ -497,6 +525,7 @@ async function renderPage(page) {
   if (page==='overview') await renderOverview(c);
   else if (page==='report') renderReportForm(c);
   else if (page==='medications') await renderMedications(c);
+  else if (page==='notes') await renderNotes(c);
   else if (page==='profile') await renderProfilePage(c);
 }
 
@@ -817,6 +846,43 @@ async function renderMedications(c) {
         </div>
       </div>`).join('');
   } catch { document.getElementById('medsContent').innerHTML = emptyHTML('Could not load medications.'); }
+}
+
+// ── DOCTOR NOTES ──
+async function renderNotes(c) {
+  c.innerHTML = `
+    <div class="greeting-section"><h1>Doctor Notes</h1><p>Notes and instructions your doctor has added to your case.</p></div>
+    <div id="notesContent"><div class="empty-mini"><p>Loading notes...</p></div></div>`;
+
+  try {
+    const riskRes = await apiCall(`${API}/Patient/risk-status`);
+    if (!riskRes||!riskRes.ok) { document.getElementById('notesContent').innerHTML = emptyHTML('No active case found.'); return; }
+    const cd = await riskRes.json();
+    const caseId = cd.caseId||cd.id;
+    if (!caseId) { document.getElementById('notesContent').innerHTML = emptyHTML('No active case.'); return; }
+
+    const res = await apiCall(`${API}/Notes/case/${caseId}`);
+    if (!res||!res.ok) {
+      const d = await res?.json().catch(()=>({}));
+      document.getElementById('notesContent').innerHTML = emptyHTML(d?.message || d?.title || 'No notes yet.');
+      return;
+    }
+    const data = await res.json();
+    const notes = data.items || data.data || (Array.isArray(data) ? data : []);
+
+    if (!notes.length) { document.getElementById('notesContent').innerHTML = emptyHTML('No notes added yet.'); return; }
+
+    document.getElementById('notesContent').innerHTML = notes.map(n => `
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <div class="card-title"><div class="card-title-icon blue"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg></div>Dr. ${escHtml(n.doctorName||'')}</div>
+          <span style="font-size:12px;color:var(--text-muted)">${formatDate(n.createdAt)}</span>
+        </div>
+        <div class="card-body">
+          <div style="font-size:13px;color:var(--text-primary);white-space:pre-wrap">${escHtml(n.content)}</div>
+        </div>
+      </div>`).join('');
+  } catch { document.getElementById('notesContent').innerHTML = emptyHTML('Could not load notes.'); }
 }
 
 async function confirmMed(medId, btn) {

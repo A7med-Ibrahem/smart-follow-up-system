@@ -33,10 +33,15 @@ namespace SmartFollowUp.API.Controllers
 
         // GET api/notes/case/{caseId}
         [HttpGet("case/{caseId}")]
-        [Authorize(Roles = "Doctor")]
+        [Authorize(Roles = "Doctor,Patient")]
         public async Task<IActionResult> GetCaseNotes(long caseId)
         {
-            var result = await _noteService.GetCaseNotesAsync(caseId);
+            var userId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var result = await _noteService.GetCaseNotesAsync(caseId, userId);
+
+            if (result == null)
+                return NotFound(new { message = "Case not found or not accessible" });
+
             return Ok(result);
         }
     }
