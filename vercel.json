@@ -2,7 +2,21 @@
   "cleanUrls": true,
   "rewrites": [
     { "source": "/", "destination": "/Frontend/login.html" },
-    { "source": "/Frontend", "destination": "/Frontend/login.html" },
-    { "source": "/Frontend/", "destination": "/Frontend/login.html" }
+    { "source": "/login.html", "destination": "/Frontend/login.html" },
+    { "source": "/login", "destination": "/Frontend/login.html" },
+    { "source": "/doctor-dashboard.html", "destination": "/Frontend/doctor-dashboard.html" },
+    { "source": "/doctor-dashboard", "destination": "/Frontend/doctor-dashboard.html" },
+    { "source": "/patient-dashboard.html", "destination": "/Frontend/patient-dashboard.html" },
+    { "source": "/patient-dashboard", "destination": "/Frontend/patient-dashboard.html" },
+    { "source": "/admin-dashboard.html", "destination": "/Frontend/admin-dashboard.html" },
+    { "source": "/admin-dashboard", "destination": "/Frontend/admin-dashboard.html" },
+    { "source": "/alerts.html", "destination": "/Frontend/alerts.html" },
+    { "source": "/alerts", "destination": "/Frontend/alerts.html" },
+    { "source": "/case-details.html", "destination": "/Frontend/case-details.html" },
+    { "source": "/case-details", "destination": "/Frontend/case-details.html" },
+    { "source": "/prescriptions.html", "destination": "/Frontend/prescriptions.html" },
+    { "source": "/prescriptions", "destination": "/Frontend/prescriptions.html" },
+    { "source": "/reports.html", "destination": "/Frontend/reports.html" },
+    { "source": "/reports", "destination": "/Frontend/reports.html" }
   ]
 }

@@ -1313,7 +1313,7 @@
         const role = localStorage.getItem("userRole");
         if (token && role) {
           const map = {
-            Doctor: "/Front doctor-dashboard.html",
+            Doctor: "doctor-dashboard.html",
             Patient: "patient-dashboard.html",
             Admin: "admin-dashboard.html",
           };
@@ -1467,11 +1467,11 @@
 
       function redirect(r) {
         const map = {
-          Doctor: "/Frontend/doctor-dashboard.html",
-          Patient: "/Frontend/patient-dashboard.html",
-          Admin: "/Frontend/admin-dashboard.html",
+          Doctor: "doctor-dashboard.html",
+          Patient: "patient-dashboard.html",
+          Admin: "admin-dashboard.html",
         };
-        window.location.href = map[r] || "/Frontend/doctor-dashboard.html";
+        window.location.href = map[r] || "doctor-dashboard.html";
       }
 
       function parseRole(token) {
