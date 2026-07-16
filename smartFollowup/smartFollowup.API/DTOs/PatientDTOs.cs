@@ -22,7 +22,14 @@
         public string? Allergies { get; set; }
         public string? CurrentMedications { get; set; }
         public string RiskLevel { get; set; } = string.Empty;
+        public decimal? LatestRiskScore { get; set; }
+        public DateTime? OperationDate { get; set; }
         public long? CaseId { get; set; }
+        public long? DoctorId { get; set; }
+        public string? DoctorName { get; set; }
+        public string? DoctorSpecialty { get; set; }
+        public string? DoctorPhone { get; set; }
+        public string? DoctorEmail { get; set; }
     }
 
     public class UpdateDoctorProfileRequestDto

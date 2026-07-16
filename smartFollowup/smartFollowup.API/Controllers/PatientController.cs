@@ -51,7 +51,13 @@ namespace SmartFollowUp.API.Controllers
             if (profile == null)
                 return NotFound(new { message = "Profile not found" });
 
-            return Ok(new { riskLevel = profile.RiskLevel, caseId = profile.CaseId });
+            return Ok(new
+            {
+                riskLevel = profile.RiskLevel,
+                caseId = profile.CaseId,
+                operationDate = profile.OperationDate,
+                latestRiskScore = profile.LatestRiskScore
+            });
         }
     }
 }

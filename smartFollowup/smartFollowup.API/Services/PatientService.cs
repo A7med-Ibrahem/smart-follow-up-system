@@ -2,6 +2,7 @@
 using SmartFollowUp.API.Data;
 using SmartFollowUp.API.DTOs;
 using SmartFollowUp.API.Enums;
+using SmartFollowUp.API.Models;
 
 namespace SmartFollowUp.API.Services
 {
@@ -24,9 +25,22 @@ namespace SmartFollowUp.API.Services
             if (user == null) return null;
 
             var latestCase = await _context.Cases
+                .Include(c => c.Doctor)
+                    .ThenInclude(d => d.DoctorProfile)
                 .Where(c => c.PatientId == patientId)
                 .OrderByDescending(c => c.CreatedAt)
                 .FirstOrDefaultAsync();
+
+            decimal? latestRiskScore = null;
+            if (latestCase != null)
+            {
+                latestRiskScore = await _context.DailyReports
+                    .Where(r => r.CaseId == latestCase.Id)
+                    .Include(r => r.AiAnalysis)
+                    .OrderByDescending(r => r.SubmittedAt)
+                    .Select(r => r.AiAnalysis!.RiskScore)
+                    .FirstOrDefaultAsync();
+            }
 
             return new PatientProfileResponseDto
             {
@@ -40,7 +54,14 @@ namespace SmartFollowUp.API.Services
                 Allergies = user.PatientProfile?.Allergies,
                 CurrentMedications = user.PatientProfile?.CurrentMedications,
                 RiskLevel = latestCase?.CurrentRiskLevel.ToString() ?? RiskLevel.Stable.ToString(),
-                CaseId = latestCase?.Id
+                LatestRiskScore = latestRiskScore,
+                OperationDate = latestCase?.OperationDate,
+                CaseId = latestCase?.Id,
+                DoctorId = latestCase?.DoctorId,
+                DoctorName = latestCase?.Doctor?.Name,
+                DoctorSpecialty = latestCase?.Doctor?.DoctorProfile?.Specialty,
+                DoctorPhone = latestCase?.Doctor?.Phone,
+                DoctorEmail = latestCase?.Doctor?.Email
             };
         }
 
@@ -56,23 +77,28 @@ namespace SmartFollowUp.API.Services
             if (request.Phone != null)
                 user.Phone = request.Phone;
 
-            if (user.PatientProfile != null)
+            if (user.PatientProfile == null)
             {
-                if (request.Age != null)
-                    user.PatientProfile.Age = request.Age;
-
-                if (request.Gender != null)
-                    user.PatientProfile.Gender = request.Gender == "male" ? Gender.Male : Gender.Female;
-
-                if (request.ChronicDiseases != null)
-                    user.PatientProfile.ChronicDiseases = request.ChronicDiseases;
-
-                if (request.Allergies != null)
-                    user.PatientProfile.Allergies = request.Allergies;
-
-                if (request.CurrentMedications != null)
-                    user.PatientProfile.CurrentMedications = request.CurrentMedications;
+                user.PatientProfile = new PatientProfile { UserId = user.Id };
+                _context.PatientProfiles.Add(user.PatientProfile);
             }
+
+            if (request.Age != null)
+                user.PatientProfile.Age = request.Age;
+
+            if (request.Gender != null)
+                user.PatientProfile.Gender = string.Equals(request.Gender, "male", StringComparison.OrdinalIgnoreCase)
+                    ? Gender.Male
+                    : Gender.Female;
+
+            if (request.ChronicDiseases != null)
+                user.PatientProfile.ChronicDiseases = request.ChronicDiseases;
+
+            if (request.Allergies != null)
+                user.PatientProfile.Allergies = request.Allergies;
+
+            if (request.CurrentMedications != null)
+                user.PatientProfile.CurrentMedications = request.CurrentMedications;
 
             user.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();

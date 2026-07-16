@@ -19,6 +19,42 @@ namespace SmartFollowUp.API.Controllers
         }
 
 
+        // GET api/admin/audit-logs
+        [HttpGet("audit-logs")]
+        public async Task<IActionResult> GetAuditLogs([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+        {
+            var result = await _adminService.GetAuditLogsAsync(page, pageSize);
+            return Ok(result);
+        }
+
+        // GET api/admin/patients
+        [HttpGet("patients")]
+        public async Task<IActionResult> GetPatients()
+        {
+            var result = await _adminService.GetPatientsAsync();
+            return Ok(result);
+        }
+
+        // DELETE api/admin/doctors/{id}
+        [HttpDelete("doctors/{id}")]
+        public async Task<IActionResult> DeleteDoctor(long id)
+        {
+            var adminId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var success = await _adminService.DeleteDoctorAsync(id, adminId);
+            if (!success)
+                return NotFound(new { message = "Doctor not found" });
+
+            return Ok(new { message = "Doctor account deleted" });
+        }
+
+        // GET api/admin/doctors
+        [HttpGet("doctors")]
+        public async Task<IActionResult> GetDoctors([FromQuery] bool? isActive = null)
+        {
+            var result = await _adminService.GetDoctorsAsync(isActive);
+            return Ok(result);
+        }
+
         // GET api/admin/doctor-requests
         [HttpGet("doctor-requests")]
         public async Task<IActionResult> GetDoctorRequests([FromQuery] string? status = null)

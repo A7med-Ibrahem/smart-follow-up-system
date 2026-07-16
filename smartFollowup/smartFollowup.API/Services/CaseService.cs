@@ -44,7 +44,8 @@ namespace SmartFollowUp.API.Services
                         Phone = request.PatientPhone,
                         PasswordHash = BCrypt.Net.BCrypt.HashPassword("Smart@123"),
                         Role = UserRole.Patient,
-                        IsActive = true
+                        IsActive = true,
+                        MustChangePassword = true
                     };
 
                     _context.Users.Add(patient);
@@ -56,6 +57,11 @@ namespace SmartFollowUp.API.Services
                         UserId = patient.Id
                     };
                     _context.PatientProfiles.Add(patientProfile);
+                }
+                else if (!string.IsNullOrWhiteSpace(request.PatientPhone) && patient.Phone != request.PatientPhone)
+                {
+                    // Existing patient — keep the phone number up to date with what the doctor entered
+                    patient.Phone = request.PatientPhone;
                 }
 
                 var newCase = new Case
@@ -75,10 +81,12 @@ namespace SmartFollowUp.API.Services
 
                 if (isNewPatient)
                 {
+                    var doctor = await _context.Users.FindAsync(doctorId);
                     _backgroundJobClient.Enqueue<EmailService>(x => x.SendPatientActivationEmailAsync(
                         patient.Email,
                         patient.Name,
-                        "Smart@123"
+                        doctor != null ? doctor.Name : "your doctor",
+                        request.OperationType ?? "your procedure"
                     ));
                 }
 
@@ -87,6 +95,7 @@ namespace SmartFollowUp.API.Services
                     Id = newCase.Id,
                     PatientName = patient.Name,
                     PatientEmail = patient.Email,
+                    PatientPhone = patient.Phone,
                     OperationType = newCase.OperationType ?? "",
                     OperationDate = newCase.OperationDate,
                     Status = newCase.Status.ToString(),
@@ -119,6 +128,7 @@ namespace SmartFollowUp.API.Services
                     Id = c.Id,
                     PatientName = c.Patient.Name,
                     PatientEmail = c.Patient.Email,
+                    PatientPhone = c.Patient.Phone,
                     OperationType = c.OperationType ?? "",
                     OperationDate = c.OperationDate,
                     Status = c.Status.ToString(),
@@ -153,6 +163,7 @@ namespace SmartFollowUp.API.Services
                 Id = c.Id,
                 PatientName = c.Patient.Name,
                 PatientEmail = c.Patient.Email,
+                PatientPhone = c.Patient.Phone,
                 
                 OperationType = c.OperationType ?? "",
                 OperationDate = c.OperationDate,
@@ -190,6 +201,7 @@ namespace SmartFollowUp.API.Services
                     Id = c.Id,
                     PatientName = c.Patient.Name,
                     PatientEmail = c.Patient.Email,
+                    PatientPhone = c.Patient.Phone,
                     OperationType = c.OperationType ?? "",
                     OperationDate = c.OperationDate,
                     Status = c.Status.ToString(),

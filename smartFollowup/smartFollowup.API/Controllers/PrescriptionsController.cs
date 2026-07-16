@@ -52,14 +52,28 @@ namespace SmartFollowUp.API.Controllers
         // POST api/prescriptions/medications/{medicationId}/confirm
         [HttpPost("medications/{medicationId}/confirm")]
         [Authorize(Roles = "Patient")]
-        public async Task<IActionResult> ConfirmMedicationTaken(long medicationId)
+        public async Task<IActionResult> ConfirmMedicationTaken(long medicationId, [FromQuery] long? adherenceId = null)
         {
             var patientId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-            var success = await _prescriptionService.ConfirmMedicationTakenAsync(medicationId, patientId);
+            var success = await _prescriptionService.ConfirmMedicationTakenAsync(medicationId, patientId, adherenceId);
             if (!success)
                 return NotFound(new { message = "Medication not found" });
 
             return Ok(new { message = "Medication confirmed as taken" });
+        }
+
+        // GET api/prescriptions/case/{caseId}/today-schedule
+        [HttpGet("case/{caseId}/today-schedule")]
+        [Authorize(Roles = "Patient")]
+        public async Task<IActionResult> GetTodaySchedule(long caseId)
+        {
+            var patientId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var result = await _prescriptionService.GetTodayScheduleAsync(caseId, patientId);
+
+            if (result == null)
+                return NotFound(new { message = "Case not found or not accessible" });
+
+            return Ok(result);
         }
 
         // PUT api/prescriptions/{id}

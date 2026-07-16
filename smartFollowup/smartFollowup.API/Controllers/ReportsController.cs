@@ -33,10 +33,29 @@ namespace SmartFollowUp.API.Controllers
 
         // GET api/reports/case/{caseId}?page=1&pageSize=10
         [HttpGet("case/{caseId}")]
-        [Authorize(Roles = "Doctor")]
+        [Authorize(Roles = "Doctor,Patient")]
         public async Task<IActionResult> GetCaseReports(long caseId, [FromQuery] PaginationRequestDto pagination)
         {
-            var result = await _reportService.GetCaseReportsAsync(caseId, pagination);
+            var userId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var result = await _reportService.GetCaseReportsAsync(caseId, pagination, userId);
+
+            if (result == null)
+                return NotFound(new { message = "Case not found or not accessible" });
+
+            return Ok(result);
+        }
+
+        // PUT api/reports/{id}
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Doctor,Patient")]
+        public async Task<IActionResult> UpdateReport(long id, UpdateReportRequestDto request)
+        {
+            var userId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var result = await _reportService.UpdateReportAsync(id, request, userId);
+
+            if (result == null)
+                return BadRequest(new { message = "Report not found, not accessible, or no longer editable (patients can only edit same-day reports)." });
+
             return Ok(result);
         }
     }

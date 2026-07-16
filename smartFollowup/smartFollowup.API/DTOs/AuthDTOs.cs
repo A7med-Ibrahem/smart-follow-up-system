@@ -5,6 +5,7 @@
     {
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+        public string? Role { get; set; }
     }
 
     // Response — Login & Register
@@ -17,6 +18,7 @@
         public string Token { get; set; } = string.Empty;
         public string RefreshToken { get; set; } = string.Empty;
         public DateTime RefreshTokenExpiry { get; set; }
+        public bool MustChangePassword { get; set; }
     }
     // Request — Doctor Registration Request
     public class DoctorRequestDto
@@ -30,6 +32,12 @@
     public class ForgotPasswordRequestDto
     {
         public string Email { get; set; } = string.Empty;
+    }
+
+    public class VerifyOtpRequestDto
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Token { get; set; } = string.Empty;
     }
 
     public class ResetPasswordRequestDto

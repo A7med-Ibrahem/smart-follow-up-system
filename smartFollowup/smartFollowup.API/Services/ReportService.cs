@@ -109,33 +109,194 @@ namespace SmartFollowUp.API.Services
             };
         }
 
-        // Get Reports for Case with Pagination
-        public async Task<PaginatedResponseDto<ReportResponseDto>> GetCaseReportsAsync(long caseId, PaginationRequestDto pagination)
+        // Update Daily Report (patient can edit their own report the same day; doctor can edit any report in their case)
+        public async Task<ReportResponseDto?> UpdateReportAsync(long reportId, UpdateReportRequestDto request, long requestingUserId)
         {
+            var report = await _context.DailyReports
+                .Include(r => r.Case)
+                .Include(r => r.AiAnalysis)
+                .FirstOrDefaultAsync(r => r.Id == reportId &&
+                    (r.PatientId == requestingUserId || r.Case.DoctorId == requestingUserId));
+
+            if (report == null) return null;
+
+            // Patients can only edit their report on the same day it was submitted
+            var isDoctor = report.Case.DoctorId == requestingUserId;
+            if (!isDoctor && report.SubmittedAt.Date != DateTime.UtcNow.Date)
+                return null;
+
+            report.Temperature = request.Temperature;
+            report.PainLevel = request.PainLevel;
+            report.Swelling = request.Swelling;
+            report.Bleeding = request.Bleeding;
+            report.Notes = request.Notes;
+
+            var createDto = new CreateReportRequestDto
+            {
+                CaseId = report.CaseId,
+                Temperature = request.Temperature,
+                PainLevel = request.PainLevel,
+                Swelling = request.Swelling,
+                Bleeding = request.Bleeding,
+                Notes = request.Notes
+            };
+            var riskLevel = CalculateRiskLevel(createDto);
+            var riskScore = CalculateRiskScore(createDto);
+
+            if (report.AiAnalysis != null)
+            {
+                report.AiAnalysis.RiskScore = riskScore;
+                report.AiAnalysis.RiskLevel = riskLevel.ToString();
+                report.AiAnalysis.AnalyzedAt = DateTime.UtcNow;
+            }
+            else
+            {
+                _context.AiAnalyses.Add(new AiAnalysis
+                {
+                    ReportId = report.Id,
+                    RiskScore = riskScore,
+                    RiskLevel = riskLevel.ToString(),
+                    AnalyzedAt = DateTime.UtcNow
+                });
+            }
+
+            report.Case.CurrentRiskLevel = riskLevel;
+
+            // If the edit newly reveals a critical condition, raise an alert for the doctor
+            if (riskLevel == RiskLevel.Critical)
+            {
+                var hasOpenAlert = await _context.Alerts.AnyAsync(a => a.ReportId == report.Id && a.Status == AlertStatus.Open);
+                if (!hasOpenAlert)
+                {
+                    _context.Alerts.Add(new Alert
+                    {
+                        CaseId = report.CaseId,
+                        ReportId = report.Id,
+                        AlertType = AlertType.Critical,
+                        Priority = AlertPriority.High,
+                        Status = AlertStatus.Open,
+                        TriggeredAt = DateTime.UtcNow
+                    });
+
+                    await _notificationService.SendNotificationAsync(
+                        report.Case.DoctorId,
+                        NotificationType.Alert.ToString(),
+                        "🚨 Critical Patient Alert",
+                        "An updated patient report shows a critical condition. Immediate attention required!"
+                    );
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return new ReportResponseDto
+            {
+                Id = report.Id,
+                CaseId = report.CaseId,
+                Temperature = report.Temperature ?? 0,
+                PainLevel = report.PainLevel ?? 0,
+                Swelling = report.Swelling,
+                Bleeding = report.Bleeding,
+                Notes = report.Notes,
+                SubmittedAt = report.SubmittedAt,
+                RiskLevel = riskLevel.ToString(),
+                RiskScore = riskScore
+            };
+        }
+
+        // Get Reports for Case with Pagination (ownership enforced: caller must be the case's doctor or its patient)
+        public async Task<PaginatedResponseDto<ReportResponseDto>?> GetCaseReportsAsync(long caseId, PaginationRequestDto pagination, long requestingUserId)
+        {
+            var existingCase = await _context.Cases
+                .FirstOrDefaultAsync(c => c.Id == caseId &&
+                    (c.DoctorId == requestingUserId || c.PatientId == requestingUserId));
+
+            if (existingCase == null) return null;
+
             var query = _context.DailyReports
                 .Where(r => r.CaseId == caseId)
                 .Include(r => r.AiAnalysis);
 
             var totalCount = await query.CountAsync();
 
-            var data = await query
+            var reports = await query
                 .OrderByDescending(r => r.SubmittedAt)
                 .Skip((pagination.Page - 1) * pagination.PageSize)
                 .Take(pagination.PageSize)
-                .Select(r => new ReportResponseDto
-                {
-                    Id = r.Id,
-                    CaseId = r.CaseId,
-                    Temperature = r.Temperature ?? 0,
-                    PainLevel = r.PainLevel ?? 0,
-                    Swelling = r.Swelling,
-                    Bleeding = r.Bleeding,
-                    Notes = r.Notes,
-                    SubmittedAt = r.SubmittedAt,
-                    RiskLevel = r.AiAnalysis != null ? r.AiAnalysis.RiskLevel : "stable",
-                    RiskScore = r.AiAnalysis != null ? r.AiAnalysis.RiskScore ?? 0 : 0
-                })
                 .ToListAsync();
+
+            // Self-heal: any report missing its risk analysis gets one computed and saved now,
+            // instead of silently being reported as "stable".
+            var needsSave = false;
+            foreach (var r in reports)
+            {
+                if (r.AiAnalysis == null)
+                {
+                    var backfillDto = new CreateReportRequestDto
+                    {
+                        CaseId = r.CaseId,
+                        Temperature = r.Temperature ?? 0,
+                        PainLevel = r.PainLevel ?? 0,
+                        Swelling = r.Swelling,
+                        Bleeding = r.Bleeding
+                    };
+                    var level = CalculateRiskLevel(backfillDto);
+                    var score = CalculateRiskScore(backfillDto);
+
+                    r.AiAnalysis = new AiAnalysis
+                    {
+                        ReportId = r.Id,
+                        RiskScore = score,
+                        RiskLevel = level.ToString(),
+                        AnalyzedAt = DateTime.UtcNow
+                    };
+                    _context.AiAnalyses.Add(r.AiAnalysis);
+                    needsSave = true;
+
+                    if (level == RiskLevel.Critical)
+                    {
+                        var hasAlert = await _context.Alerts.AnyAsync(a => a.ReportId == r.Id);
+                        if (!hasAlert)
+                        {
+                            _context.Alerts.Add(new Alert
+                            {
+                                CaseId = r.CaseId,
+                                ReportId = r.Id,
+                                AlertType = AlertType.Critical,
+                                Priority = AlertPriority.High,
+                                Status = AlertStatus.Open,
+                                TriggeredAt = DateTime.UtcNow
+                            });
+
+                            await _notificationService.SendNotificationAsync(
+                                existingCase.DoctorId,
+                                NotificationType.Alert.ToString(),
+                                "🚨 Critical Patient Alert",
+                                "A previously unanalyzed report shows a critical condition. Immediate attention required!"
+                            );
+                        }
+                    }
+
+                    // Keep the case's current risk level in sync if this is its most recent report
+                    if (r.Id == reports.OrderByDescending(x => x.SubmittedAt).First().Id)
+                        existingCase.CurrentRiskLevel = level;
+                }
+            }
+            if (needsSave) await _context.SaveChangesAsync();
+
+            var data = reports.Select(r => new ReportResponseDto
+            {
+                Id = r.Id,
+                CaseId = r.CaseId,
+                Temperature = r.Temperature ?? 0,
+                PainLevel = r.PainLevel ?? 0,
+                Swelling = r.Swelling,
+                Bleeding = r.Bleeding,
+                Notes = r.Notes,
+                SubmittedAt = r.SubmittedAt,
+                RiskLevel = r.AiAnalysis!.RiskLevel,
+                RiskScore = r.AiAnalysis!.RiskScore ?? 0
+            }).ToList();
 
             return new PaginatedResponseDto<ReportResponseDto>
             {

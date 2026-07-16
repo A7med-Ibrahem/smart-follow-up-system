@@ -79,7 +79,8 @@ header{height:68px;background:var(--bg-card);border-bottom:1px solid var(--borde
 .btn-secondary:hover{background:var(--bg-input);}
 
 /* ── TABLE ── */
-.table-container{background:var(--bg-card);border-radius:18px;border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;}
+.table-container{background:var(--bg-card);border-radius:18px;border:1px solid var(--border);box-shadow:var(--shadow);overflow-x:auto;}
+.table-container table{min-width:600px;}
 table{width:100%;border-collapse:collapse;}
 th{text-align:left;padding:13px 18px;background:var(--bg-input);color:var(--text-muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
 td{padding:14px 18px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
@@ -190,9 +191,8 @@ tr:hover td{background:rgba(37,99,235,0.015);transition:background .15s;cursor:p
 @media(max-width:768px){
   aside{position:fixed;left:-100%;top:0;height:100%;width:250px;padding:24px;transition:left var(--transition);z-index:200;}
   aside.open{left:0;}.logo span,.nav-link span{display:flex;}.nav-link{justify-content:flex-start;}.nav-badge{display:flex;}
-  .mobile-menu-btn{display:flex;}.sidebar-overlay{display:block;}
+  .mobile-menu-btn{display:flex;}.sidebar-overlay.open{display:block;}
   .content{padding:16px;}.stats-row{grid-template-columns:1fr 1fr;}
-  th:nth-child(4),td:nth-child(4),th:nth-child(5),td:nth-child(5){display:none;}
   .vitals-grid{grid-template-columns:1fr;}
 }
 @media(max-width:480px){.stats-row{grid-template-columns:1fr;}.search-bar{display:none;}.filter-tabs{width:100%;}.filter-tab{flex:1;text-align:center;}}
@@ -374,15 +374,24 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // ── AUTH ──
 function headers() { return {'Content-Type':'application/json','Authorization':`Bearer ${localStorage.getItem('token')}`}; }
+let refreshPromise = null;
 async function apiCall(url, opts={}) {
   opts.headers = headers();
   let res = await fetch(url, opts);
   if (res.status === 401) {
     const rt = localStorage.getItem('refreshToken');
     if (!rt) { logout(); return null; }
-    const r = await fetch(`${API}/Auth/refresh-token`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refreshToken:rt})});
-    if (!r.ok) { logout(); return null; }
-    localStorage.setItem('token', (await r.json()).token);
+    if (!refreshPromise) {
+      refreshPromise = fetch(`${API}/Auth/refresh-token`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refreshToken:rt})})
+        .then(async r => {
+          if (!r.ok) throw new Error('refresh_failed');
+          const d = await r.json();
+          localStorage.setItem('token', d.accessToken);
+          if (d.refreshToken) localStorage.setItem('refreshToken', d.refreshToken);
+        })
+        .finally(() => { refreshPromise = null; });
+    }
+    try { await refreshPromise; } catch { logout(); return null; }
     opts.headers = headers();
     res = await fetch(url, opts);
   }
@@ -464,7 +473,7 @@ function renderReports() {
 
   tbody.innerHTML = page.map((r,i) => {
     const risk  = getRisk(r);
-    const score = r.aiAnalysis?.riskScore ?? '—';
+    const score = r.riskScore ?? r.aiAnalysis?.riskScore ?? '—';
     const {bg, text} = avatarColor(r.patientName||'P');
     const highTemp = parseFloat(r.temperature) >= 38;
     const highPain = parseInt(r.painLevel) >= 7;
@@ -511,7 +520,7 @@ function showEmpty(msg='No reports found.') {
 function openReport(report) {
   const r = typeof report === 'string' ? JSON.parse(report) : report;
   const risk  = getRisk(r);
-  const score = r.aiAnalysis?.riskScore ?? 0;
+  const score = r.riskScore ?? r.aiAnalysis?.riskScore ?? 0;
   document.getElementById('modalTitle').textContent = `Report — ${formatDate(r.submittedAt)}`;
   document.getElementById('modalBody').innerHTML = `
     <div class="report-detail-header">
@@ -541,7 +550,7 @@ function openReport(report) {
         ${r.bleeding?'⚠️ Bleeding present':'✓ No bleeding'}
       </div>
     </div>
-    ${r.aiAnalysis ? `
+    ${(r.riskLevel || r.aiAnalysis) ? `
     <div class="ai-section">
       <div class="ai-label">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -557,9 +566,63 @@ function openReport(report) {
       <div class="notes-text">${escHtml(r.notes)}</div>
     </div>` : ''}
     <div style="margin-top:16px;display:flex;gap:8px">
+      <button onclick="openEditReportForm(${JSON.stringify(r).replace(/"/g,'&quot;')})" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:var(--transition)">Edit Report</button>
       <button onclick="location.href='case-details.html?id=${r.caseId}'" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--primary);background:var(--primary-light);color:var(--primary);font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:var(--transition)">View Full Case</button>
     </div>`;
   document.getElementById('reportModal').classList.add('open');
+}
+
+function openEditReportForm(r) {
+  document.getElementById('modalTitle').textContent = `Edit Report — ${formatDate(r.submittedAt)}`;
+  document.getElementById('modalBody').innerHTML = `
+    <div id="drError" style="display:none;padding:10px 14px;border-radius:10px;font-size:13px;margin-bottom:14px;background:rgba(239,68,68,0.08);color:var(--error)"></div>
+    <div class="form-group"><label class="form-label" style="font-size:12px">Temperature (°C)</label><input type="number" step="0.1" class="form-input" id="drTemp" value="${r.temperature}"/></div>
+    <div class="form-group"><label class="form-label" style="font-size:12px">Pain Level (1-10)</label><input type="number" min="1" max="10" class="form-input" id="drPain" value="${r.painLevel}"/></div>
+    <div class="form-group" style="display:flex;align-items:center;gap:10px"><label class="form-label" style="margin:0;font-size:12px">Swelling</label><input type="checkbox" id="drSwelling" ${r.swelling?'checked':''}/></div>
+    <div class="form-group" style="display:flex;align-items:center;gap:10px"><label class="form-label" style="margin:0;font-size:12px">Bleeding</label><input type="checkbox" id="drBleeding" ${r.bleeding?'checked':''}/></div>
+    <div class="form-group"><label class="form-label" style="font-size:12px">Notes</label><textarea class="form-input" id="drNotes" rows="3">${escHtml(r.notes||'')}</textarea></div>
+    <div style="margin-top:16px;display:flex;gap:8px">
+      <button onclick="openReport(${JSON.stringify(r).replace(/"/g,'&quot;')})" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif">Cancel</button>
+      <button id="drSaveBtn" onclick="saveDoctorReportEdit(${r.id})" style="flex:1;padding:10px;border-radius:10px;border:none;background:var(--primary);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif">Save Changes</button>
+    </div>`;
+}
+
+async function saveDoctorReportEdit(reportId) {
+  const temp = parseFloat(document.getElementById('drTemp').value);
+  const pain = parseInt(document.getElementById('drPain').value);
+  const errBox = document.getElementById('drError');
+  errBox.style.display = 'none';
+
+  if (isNaN(temp) || temp < 35 || temp > 42) { errBox.style.display='block'; errBox.textContent='Temperature must be between 35 and 42°C.'; return; }
+  if (isNaN(pain) || pain < 1 || pain > 10) { errBox.style.display='block'; errBox.textContent='Pain level must be between 1 and 10.'; return; }
+
+  const btn = document.getElementById('drSaveBtn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  try {
+    const res = await apiCall(`${API}/Reports/${reportId}`, {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        temperature: temp,
+        painLevel: pain,
+        swelling: document.getElementById('drSwelling').checked,
+        bleeding: document.getElementById('drBleeding').checked,
+        notes: document.getElementById('drNotes').value.trim() || null
+      })
+    });
+    if (res && res.ok) {
+      showToast('Report updated successfully.', 'success');
+      closeModal();
+      if (typeof loadAllReports === 'function') loadAllReports();
+    } else {
+      const d = await res?.json().catch(()=>({}));
+      errBox.style.display='block'; errBox.textContent = d.message || 'Could not update the report.';
+      btn.disabled = false; btn.textContent = 'Save Changes';
+    }
+  } catch {
+    errBox.style.display='block'; errBox.textContent = 'Network error. Please try again.';
+    btn.disabled = false; btn.textContent = 'Save Changes';
+  }
 }
 
 function closeModal() { document.getElementById('reportModal').classList.remove('open'); }
@@ -616,8 +679,8 @@ document.getElementById('themeToggle').addEventListener('click',()=>{const cur=d
 function updateThemeIcon(t){document.getElementById('themeIcon').innerHTML=t==='dark'?`<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`:`<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`;}
 
 // ── SIDEBAR ──
-function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebarOverlay').classList.toggle('visible');}
-function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('visible');}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebarOverlay').classList.toggle('open');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('open');}
 
 // ── AVATAR ──
 async function loadUserAvatar() {
@@ -643,7 +706,7 @@ function showToast(msg,type='success'){
 }
 
 // ── HELPERS ──
-function getRisk(r){const v=r.aiAnalysis?.riskLevel??r.aiAnalysis?.riskScore??null;if(v===null)return 'Stable';if(typeof v==='string'){if(v==='Critical'||v==='critical')return 'Critical';if(v==='Moderate'||v==='moderate')return 'Moderate';return 'Stable';}if(typeof v==='number'){if(v>=70)return 'Critical';if(v>=40)return 'Moderate';return 'Stable';}return 'Stable';}
+function getRisk(r){const v=r.riskLevel??r.aiAnalysis?.riskLevel??r.riskScore??r.aiAnalysis?.riskScore??null;if(v===null)return 'Stable';if(typeof v==='string'){if(v==='Critical'||v==='critical')return 'Critical';if(v==='Moderate'||v==='moderate')return 'Moderate';return 'Stable';}if(typeof v==='number'){if(v>=70)return 'Critical';if(v>=40)return 'Moderate';return 'Stable';}return 'Stable';}
 function formatDate(s){if(!s)return '—';const d=new Date(s);return isNaN(d)?s:d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});}
 function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function getInitials(n){return String(n||'').split(' ').filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('');}

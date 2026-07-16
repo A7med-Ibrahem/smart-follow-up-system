@@ -38,8 +38,27 @@ namespace SmartFollowUp.API.Controllers
         [Authorize(Roles = "Doctor,Patient")]
         public async Task<IActionResult> GetCaseImages(long caseId)
         {
-            var result = await _woundImageService.GetCaseImagesAsync(caseId);
+            var userId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var result = await _woundImageService.GetCaseImagesAsync(caseId, userId);
+
+            if (result == null)
+                return NotFound(new { message = "Case not found or not accessible" });
+
             return Ok(result);
+        }
+
+        // DELETE api/woundimages/{id}
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Patient")]
+        public async Task<IActionResult> DeleteImage(long id)
+        {
+            var patientId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var success = await _woundImageService.DeleteImageAsync(id, patientId);
+
+            if (!success)
+                return NotFound(new { message = "Image not found or not accessible" });
+
+            return Ok(new { message = "Image deleted" });
         }
     }
 }

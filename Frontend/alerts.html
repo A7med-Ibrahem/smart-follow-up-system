@@ -169,7 +169,7 @@ header{height:68px;background:var(--bg-card);border-bottom:1px solid var(--borde
 @media(max-width:768px){
   aside{position:fixed;left:-100%;top:0;height:100%;width:250px;padding:24px;transition:left var(--transition);z-index:200;}
   aside.open{left:0;}.logo span,.nav-link span{display:flex;}.nav-link{justify-content:flex-start;}.nav-badge{display:flex;}
-  .mobile-menu-btn{display:flex;}.sidebar-overlay{display:block;}
+  .mobile-menu-btn{display:flex;}.sidebar-overlay.open{display:block;}
   .content{padding:16px;}.stats-row{grid-template-columns:1fr;}
   .alert-vitals{display:none;}.alert-actions{flex-direction:row;align-items:center;}
 }
@@ -338,15 +338,24 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // ── AUTH ──
 function headers() { return {'Content-Type':'application/json','Authorization':`Bearer ${localStorage.getItem('token')}`}; }
+let refreshPromise = null;
 async function apiCall(url, opts={}) {
   opts.headers = headers();
   let res = await fetch(url, opts);
   if (res.status === 401) {
     const rt = localStorage.getItem('refreshToken');
     if (!rt) { logout(); return null; }
-    const r = await fetch(`${API}/Auth/refresh-token`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refreshToken:rt})});
-    if (!r.ok) { logout(); return null; }
-    localStorage.setItem('token', (await r.json()).token);
+    if (!refreshPromise) {
+      refreshPromise = fetch(`${API}/Auth/refresh-token`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refreshToken:rt})})
+        .then(async r => {
+          if (!r.ok) throw new Error('refresh_failed');
+          const d = await r.json();
+          localStorage.setItem('token', d.accessToken);
+          if (d.refreshToken) localStorage.setItem('refreshToken', d.refreshToken);
+        })
+        .finally(() => { refreshPromise = null; });
+    }
+    try { await refreshPromise; } catch { logout(); return null; }
     opts.headers = headers();
     res = await fetch(url, opts);
   }
@@ -552,8 +561,8 @@ async function loadUserAvatar() {
 function initTheme(){const t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);updateThemeIcon(t);}
 document.getElementById('themeToggle').addEventListener('click',()=>{const cur=document.documentElement.getAttribute('data-theme');const next=cur==='light'?'dark':'light';document.documentElement.setAttribute('data-theme',next);localStorage.setItem('theme',next);updateThemeIcon(next);});
 function updateThemeIcon(t){document.getElementById('themeIcon').innerHTML=t==='dark'?`<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`:`<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`;}
-function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebarOverlay').classList.toggle('visible');}
-function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('visible');}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebarOverlay').classList.toggle('open');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('open');}
 function openChangePass(){showToast('Change password available in the Dashboard.','success');}
 
 // ── TOAST ──

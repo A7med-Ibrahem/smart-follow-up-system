@@ -1130,7 +1130,7 @@
         .mobile-menu-btn {
           display: flex;
         }
-        .sidebar-overlay {
+        .sidebar-overlay.open {
           display: block;
         }
         .details-grid {
@@ -1894,6 +1894,7 @@
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         };
       }
+      let refreshPromise = null;
       async function apiCall(url, opts = {}) {
         opts.headers = headers();
         let res = await fetch(url, opts);
@@ -1903,17 +1904,24 @@
             logout();
             return null;
           }
-          const r = await fetch(`${API}/Auth/refresh-token`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ refreshToken: rt }),
-          });
-          if (!r.ok) {
+          if (!refreshPromise) {
+            refreshPromise = fetch(`${API}/Auth/refresh-token`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ refreshToken: rt }),
+            }).then(async (r) => {
+              if (!r.ok) throw new Error("refresh_failed");
+              const d = await r.json();
+              localStorage.setItem("token", d.accessToken);
+              if (d.refreshToken) localStorage.setItem("refreshToken", d.refreshToken);
+            }).finally(() => { refreshPromise = null; });
+          }
+          try {
+            await refreshPromise;
+          } catch {
             logout();
             return null;
           }
-          const d = await r.json();
-          localStorage.setItem("token", d.token);
           opts.headers = headers();
           res = await fetch(url, opts);
         }
@@ -2018,17 +2026,17 @@
 
         // Render risk from latest report AI
         const latest = reports[0];
-        if (latest.aiAnalysis) {
+        if (latest.riskLevel || latest.aiAnalysis) {
           renderRiskScore(
-            latest.aiAnalysis.riskScore,
-            latest.aiAnalysis.riskLevel,
+            latest.riskScore ?? latest.aiAnalysis?.riskScore,
+            latest.riskLevel ?? latest.aiAnalysis?.riskLevel,
           );
         }
 
         document.getElementById("reportsList").innerHTML = reports
           .map((r) => {
-            const risk = r.aiAnalysis
-              ? getRiskLabel(r.aiAnalysis.riskLevel ?? r.aiAnalysis.riskScore)
+            const risk = (r.riskLevel || r.aiAnalysis)
+              ? getRiskLabel(r.riskLevel ?? r.aiAnalysis?.riskLevel ?? r.riskScore ?? r.aiAnalysis?.riskScore)
               : "Stable";
             return `<div class="report-item" onclick="expandReport(this)">
       <div class="report-top">
@@ -2162,11 +2170,16 @@
         document.getElementById("imagesList").innerHTML =
           `<div class="images-grid">${imgs
             .map(
-              (img) => `
-    <div class="wound-img-wrap" onclick="openLightbox('${escHtml(img.imageUrl)}')">
-      <img src="${escHtml(img.imageUrl)}" alt="Wound" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22><rect fill=%22%23e2e8f0%22 width=%22100%22 height=%22100%22/></svg>'"/>
-      <span class="wound-img-date">${formatDate(img.uploadedAt)}</span>
-    </div>`,
+              (img) => {
+                const fullUrl = img.imageUrl?.startsWith('http') ? img.imageUrl : `${API.replace(/\/api$/, '')}${img.imageUrl}`;
+                const d = new Date(img.uploadedAt);
+                const dateLabel = isNaN(d) ? '' : d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' · ' + d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+                return `
+    <div class="wound-img-wrap" title="From the report submitted on ${dateLabel} — click the photo to enlarge, or the label to view that report">
+      <img src="${escHtml(fullUrl)}" alt="Wound" loading="lazy" onclick="openLightbox('${escHtml(fullUrl)}')" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22><rect fill=%22%23e2e8f0%22 width=%22100%22 height=%22100%22/></svg>'"/>
+      <span class="wound-img-date" style="cursor:pointer" onclick="switchTab('reports', document.querySelector('[onclick*=\\'reports\\']'))">Report · ${dateLabel}</span>
+    </div>`;
+              },
             )
             .join("")}</div>`;
       }
@@ -2284,7 +2297,16 @@
       <div class="form-group" style="margin:0"><label class="form-label" style="font-size:11px">Dosage</label><input class="form-input" placeholder="e.g. 500mg" data-field="dosage" style="font-size:13px"/></div>
     </div>
     <div class="form-row">
-      <div class="form-group" style="margin:0"><label class="form-label" style="font-size:11px">Frequency</label><input class="form-input" placeholder="e.g. 3x daily" data-field="frequency" style="font-size:13px"/></div>
+      <div class="form-group" style="margin:0"><label class="form-label" style="font-size:11px">Times per day</label>
+        <select class="form-input" data-field="timesPerDay" style="font-size:13px">
+          <option value="1">Once a day</option>
+          <option value="2">Twice a day</option>
+          <option value="3" selected>3 times a day</option>
+          <option value="4">4 times a day</option>
+          <option value="5">5 times a day</option>
+          <option value="6">6 times a day</option>
+        </select>
+      </div>
       <div class="form-group" style="margin:0"><label class="form-label" style="font-size:11px">Duration (days)</label><input class="form-input" type="number" placeholder="7" data-field="days" style="font-size:13px"/></div>
     </div>`;
         document.getElementById("medsContainer").appendChild(div);
@@ -2302,8 +2324,8 @@
             .querySelector('[data-field="dosage"]')
             ?.value.trim();
           const freq = div
-            .querySelector('[data-field="frequency"]')
-            ?.value.trim();
+            .querySelector('[data-field="timesPerDay"]')
+            ?.value;
           const days = div.querySelector('[data-field="days"]')?.value;
           if (!name || !dosage || !freq || !days) {
             showToast("Please fill in all medication fields.", "error");
@@ -2312,7 +2334,7 @@
           medications.push({
             medicationName: name,
             dosage,
-            frequency: freq,
+            timesPerDay: parseInt(freq),
             durationDays: parseInt(days),
           });
         }
@@ -2477,11 +2499,11 @@
       // ── SIDEBAR ──
       function toggleSidebar() {
         document.getElementById("sidebar").classList.toggle("open");
-        document.getElementById("sidebarOverlay").classList.toggle("visible");
+        document.getElementById("sidebarOverlay").classList.toggle("open");
       }
       function closeSidebar() {
         document.getElementById("sidebar").classList.remove("open");
-        document.getElementById("sidebarOverlay").classList.remove("visible");
+        document.getElementById("sidebarOverlay").classList.remove("open");
       }
 
       // ── USER AVATAR ──

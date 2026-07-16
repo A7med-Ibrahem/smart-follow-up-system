@@ -18,6 +18,117 @@ namespace SmartFollowUp.API.Services
             _backgroundJobClient = backgroundJobClient;
         }
 
+        // Get All Patients
+        public async Task<List<PatientListItemDto>> GetPatientsAsync()
+        {
+            var patients = await _context.Users
+                .Where(u => u.Role == UserRole.Patient)
+                .Include(u => u.PatientProfile)
+                .OrderByDescending(u => u.CreatedAt)
+                .Select(u => new PatientListItemDto
+                {
+                    UserId = u.Id,
+                    Name = u.Name,
+                    Email = u.Email,
+                    Phone = u.Phone,
+                    Age = u.PatientProfile != null ? u.PatientProfile.Age : null,
+                    IsActive = u.IsActive,
+                    CreatedAt = u.CreatedAt
+                })
+                .ToListAsync();
+
+            if (!patients.Any()) return patients;
+
+            var patientIds = patients.Select(p => p.UserId).ToList();
+            var latestDoctorByPatient = await _context.Cases
+                .Where(c => patientIds.Contains(c.PatientId))
+                .Include(c => c.Doctor)
+                .GroupBy(c => c.PatientId)
+                .Select(g => g.OrderByDescending(c => c.CreatedAt).First())
+                .ToDictionaryAsync(c => c.PatientId, c => c.Doctor.Name);
+
+            foreach (var p in patients)
+                p.DoctorName = latestDoctorByPatient.TryGetValue(p.UserId, out var name) ? name : null;
+
+            return patients;
+        }
+
+        // Delete Doctor (soft delete — preserves case/report history)
+        public async Task<bool> DeleteDoctorAsync(long doctorId, long adminId)
+        {
+            var doctor = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == doctorId && u.Role == UserRole.Doctor);
+
+            if (doctor == null) return false;
+
+            doctor.IsDeleted = true;
+            doctor.IsActive = false;
+
+            var admin = await _context.Users.FindAsync(adminId);
+            _context.AuditLogs.Add(new AuditLog
+            {
+                UserId = adminId,
+                UserName = admin?.Name ?? "Admin",
+                UserRole = "Admin",
+                Action = "DeleteDoctor",
+                EntityName = "User",
+                EntityId = doctor.Id.ToString(),
+                NewValues = $"Deleted doctor account: {doctor.Name} ({doctor.Email})"
+            });
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        // Get All Real Doctors (from Users table, not requests)
+        public async Task<List<DoctorListItemDto>> GetDoctorsAsync(bool? isActive = null)
+        {
+            var query = _context.Users
+                .Where(u => u.Role == UserRole.Doctor)
+                .Include(u => u.DoctorProfile)
+                .AsQueryable();
+
+            if (isActive.HasValue)
+                query = query.Where(u => u.IsActive == isActive.Value);
+
+            return await query
+                .OrderByDescending(u => u.CreatedAt)
+                .Select(u => new DoctorListItemDto
+                {
+                    UserId = u.Id,
+                    Name = u.Name,
+                    Email = u.Email,
+                    Phone = u.Phone,
+                    Specialty = u.DoctorProfile != null ? u.DoctorProfile.Specialty : null,
+                    LicenseNumber = u.DoctorProfile != null ? u.DoctorProfile.LicenseNumber : null,
+                    Hospital = u.DoctorProfile != null ? u.DoctorProfile.Hospital : null,
+                    IsActive = u.IsActive,
+                    CreatedAt = u.CreatedAt
+                })
+                .ToListAsync();
+        }
+
+        // Get Audit Logs
+        public async Task<List<AuditLogResponseDto>> GetAuditLogsAsync(int page = 1, int pageSize = 20)
+        {
+            return await _context.AuditLogs
+                .OrderByDescending(a => a.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(a => new AuditLogResponseDto
+                {
+                    Id = a.Id,
+                    UserName = a.UserName,
+                    UserRole = a.UserRole,
+                    Action = a.Action,
+                    EntityName = a.EntityName,
+                    EntityId = a.EntityId,
+                    NewValues = a.NewValues,
+                    CreatedAt = a.CreatedAt
+                })
+                .ToListAsync();
+        }
+
         // Get All Doctor Requests
         public async Task<List<DoctorRequestResponseDto>> GetDoctorRequestsAsync(string? status = null)
         {
@@ -56,7 +167,8 @@ namespace SmartFollowUp.API.Services
                 Email = request.Email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("Smart@123"),
                 Role = UserRole.Doctor,
-                IsActive = true
+                IsActive = true,
+                MustChangePassword = true
             };
 
             _context.Users.Add(user);
@@ -74,21 +186,24 @@ namespace SmartFollowUp.API.Services
             request.Status = DoctorRequestStatus.Approved;
             request.ReviewedBy = adminId;
 
+            var admin = await _context.Users.FindAsync(adminId);
+            _context.AuditLogs.Add(new AuditLog
+            {
+                UserId = adminId,
+                UserName = admin?.Name ?? "Admin",
+                UserRole = "Admin",
+                Action = "ApproveDoctorRequest",
+                EntityName = "DoctorRequest",
+                EntityId = request.Id.ToString(),
+                NewValues = $"Approved doctor request for {request.Name} ({request.Email})"
+            });
+
             await _context.SaveChangesAsync();
 
-            _backgroundJobClient.Enqueue<EmailService>(x => x.SendEmailAsync(
+            _backgroundJobClient.Enqueue<EmailService>(x => x.SendDoctorApprovedEmailAsync(
                 request.Email,
                 request.Name,
-                "Smart Follow Up — Account Approved ✅",
-                $@"
-                <h2>Congratulations, {request.Name}!</h2>
-                <p>Your doctor account has been approved.</p>
-                <p><strong>Email:</strong> {request.Email}</p>
-                <p><strong>Temporary Password:</strong> Smart@123</p>
-                <p>Please login and change your password.</p>
-                <br>
-                <p>Smart Follow Up Team</p>
-                "
+                request.Specialty ?? "General"
             ));
 
             return true;
@@ -106,20 +221,24 @@ namespace SmartFollowUp.API.Services
             request.RejectionReason = reason;
             request.ReviewedBy = adminId;
 
+            var admin = await _context.Users.FindAsync(adminId);
+            _context.AuditLogs.Add(new AuditLog
+            {
+                UserId = adminId,
+                UserName = admin?.Name ?? "Admin",
+                UserRole = "Admin",
+                Action = "RejectDoctorRequest",
+                EntityName = "DoctorRequest",
+                EntityId = request.Id.ToString(),
+                NewValues = $"Rejected doctor request for {request.Name} ({request.Email}). Reason: {reason}"
+            });
+
             await _context.SaveChangesAsync();
 
-            _backgroundJobClient.Enqueue<EmailService>(x => x.SendEmailAsync(
+            _backgroundJobClient.Enqueue<EmailService>(x => x.SendDoctorRejectedEmailAsync(
                 request.Email,
                 request.Name,
-                "Smart Follow Up — Application Update",
-                $@"
-                <h2>Dear {request.Name},</h2>
-                <p>We regret to inform you that your registration request has been rejected.</p>
-                <p><strong>Reason:</strong> {reason}</p>
-                <p>If you have any questions, please contact support.</p>
-                <br>
-                <p>Smart Follow Up Team</p>
-                "
+                reason
             ));
 
             return true;

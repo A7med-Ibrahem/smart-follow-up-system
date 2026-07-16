@@ -11,6 +11,7 @@ namespace SmartFollowUp.API.Models
         public UserRole Role { get; set; } = UserRole.Patient;
         public string? Phone { get; set; }
         public bool IsActive { get; set; } = false;
+        public bool MustChangePassword { get; set; } = false;
         public string? ActivationToken { get; set; }
         public string? OtpCode { get; set; }
         public DateTime? OtpExpiry { get; set; }

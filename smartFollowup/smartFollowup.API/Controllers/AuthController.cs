@@ -32,6 +32,7 @@ namespace SmartFollowUp.API.Controllers
         
         // POST api/auth/forgot-password
         [HttpPost("forgot-password")]
+        [EnableRateLimiting("forgot-password")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordRequestDto request)
         {
             var success = await _authService.ForgotPasswordAsync(request.Email);
@@ -41,13 +42,25 @@ namespace SmartFollowUp.API.Controllers
             return Ok(new { message = "Reset token sent to your email" });
         }
 
+        // POST api/auth/verify-otp
+        [HttpPost("verify-otp")]
+        [EnableRateLimiting("verify-otp")]
+        public async Task<IActionResult> VerifyOtp(VerifyOtpRequestDto request)
+        {
+            var error = await _authService.VerifyOtpAsync(request);
+            if (error != null)
+                return BadRequest(new { message = error });
+
+            return Ok(new { message = "Code verified." });
+        }
+
         // POST api/auth/reset-password
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPasswordRequestDto request)
         {
-            var success = await _authService.ResetPasswordAsync(request);
-            if (!success)
-                return BadRequest(new { message = "Invalid token or email" });
+            var error = await _authService.ResetPasswordAsync(request);
+            if (error != null)
+                return BadRequest(new { message = error });
 
             return Ok(new { message = "Password reset successfully" });
         }
@@ -90,11 +103,11 @@ namespace SmartFollowUp.API.Controllers
         public async Task<IActionResult> ChangePassword(ChangePasswordRequestDto request)
         {
             var userId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-            var success = await _authService.ChangePasswordAsync(userId, request);
-            if (!success)
+            var newToken = await _authService.ChangePasswordAsync(userId, request);
+            if (newToken == null)
                 return BadRequest(new { message = "Current password is incorrect" });
 
-            return Ok(new { message = "Password changed successfully" });
+            return Ok(new { message = "Password changed successfully", token = newToken });
         }
 
     }

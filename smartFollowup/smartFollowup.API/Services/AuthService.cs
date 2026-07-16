@@ -35,6 +35,10 @@ namespace SmartFollowUp.API.Services
             if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
                 return null;
 
+            if (!string.IsNullOrWhiteSpace(request.Role) &&
+                !string.Equals(request.Role, user.Role.ToString(), StringComparison.OrdinalIgnoreCase))
+                return null;
+
             var refreshToken = GenerateRefreshToken();
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
@@ -48,7 +52,8 @@ namespace SmartFollowUp.API.Services
                 Role = user.Role.ToString(),
                 Token = GenerateToken(user),
                 RefreshToken = refreshToken,
-                RefreshTokenExpiry = user.RefreshTokenExpiry.Value
+                RefreshTokenExpiry = user.RefreshTokenExpiry.Value,
+                MustChangePassword = user.MustChangePassword
             };
         }
 
@@ -83,11 +88,16 @@ namespace SmartFollowUp.API.Services
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email == email);
 
-            if (user == null) return false;
+            // Admin accounts cannot use self-service password reset for security reasons
+            if (user == null || user.Role == UserRole.Admin) return false;
+
+            // Cooldown: prevent sending a new code within 60 seconds of the last one
+            if (user.OtpExpiry.HasValue && user.OtpExpiry.Value > DateTime.UtcNow.AddMinutes(9))
+                return true; // A code was already sent recently — pretend success, don't resend
 
             var otpCode = new Random().Next(100000, 999999).ToString();
             user.OtpCode = otpCode;
-            user.OtpExpiry = DateTime.UtcNow.AddMinutes(10);
+            user.OtpExpiry = DateTime.UtcNow.AddMinutes(15);
             user.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
@@ -101,15 +111,35 @@ namespace SmartFollowUp.API.Services
         }
 
         // Reset Password
-        public async Task<bool> ResetPasswordAsync(ResetPasswordRequestDto request)
+        // Verify OTP (check-only, does not change the password or clear the code)
+        public async Task<string?> VerifyOtpAsync(VerifyOtpRequestDto request)
         {
             var user = await _context.Users
-                .FirstOrDefaultAsync(u =>
-                    u.Email == request.Email &&
-                    u.OtpCode == request.Token &&
-                    u.OtpExpiry > DateTime.UtcNow);
+                .FirstOrDefaultAsync(u => u.Email == request.Email);
 
-            if (user == null) return false;
+            if (user == null) return "Email not found.";
+
+            if (user.OtpCode != request.Token)
+                return "Invalid code. Please check the code and try again.";
+
+            if (!user.OtpExpiry.HasValue || user.OtpExpiry.Value <= DateTime.UtcNow)
+                return "This code has expired. Please request a new one.";
+
+            return null; // null = valid
+        }
+
+        public async Task<string?> ResetPasswordAsync(ResetPasswordRequestDto request)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == request.Email);
+
+            if (user == null) return "Email not found.";
+
+            if (user.OtpCode != request.Token)
+                return "Invalid code. Please check the code and try again.";
+
+            if (!user.OtpExpiry.HasValue || user.OtpExpiry.Value <= DateTime.UtcNow)
+                return "This code has expired. Please request a new one.";
 
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
             user.OtpCode = null;
@@ -117,7 +147,7 @@ namespace SmartFollowUp.API.Services
             user.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
-            return true;
+            return null; // null = success
         }
 
         // Logout
@@ -135,20 +165,21 @@ namespace SmartFollowUp.API.Services
         }
 
         // Change Password
-        public async Task<bool> ChangePasswordAsync(long userId, ChangePasswordRequestDto request)
+        public async Task<string?> ChangePasswordAsync(long userId, ChangePasswordRequestDto request)
         {
             var user = await _context.Users.FindAsync(userId);
 
-            if (user == null) return false;
+            if (user == null) return null;
 
             if (!BCrypt.Net.BCrypt.Verify(request.CurrentPassword, user.PasswordHash))
-                return false;
+                return null;
 
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+            user.MustChangePassword = false;
             user.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
-            return true;
+            return GenerateToken(user);
         }
 
         // Generate Refresh Token
@@ -197,7 +228,8 @@ namespace SmartFollowUp.API.Services
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role.ToString())
+                new Claim(ClaimTypes.Role, user.Role.ToString()),
+                new Claim("mustChangePassword", user.MustChangePassword.ToString())
             };
 
             var token = new JwtSecurityToken(

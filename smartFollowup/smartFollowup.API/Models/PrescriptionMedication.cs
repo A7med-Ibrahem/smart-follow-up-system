@@ -7,6 +7,7 @@
         public string MedicationName { get; set; } = string.Empty;
         public string? Dosage { get; set; }
         public string? Frequency { get; set; }
+        public int TimesPerDay { get; set; } = 1;
         public int? DurationDays { get; set; }
 
         // Navigation Properties

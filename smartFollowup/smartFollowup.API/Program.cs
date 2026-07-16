@@ -14,7 +14,6 @@ using SmartFollowUp.API.Validators;
 using System.Text;
 using System.Threading.RateLimiting;
 
-
 namespace smartFollowup.API
 {
     public class Program
@@ -44,6 +43,7 @@ namespace smartFollowup.API
             builder.Services.AddScoped<PatientService>();
             builder.Services.AddScoped<EmailService>();
             builder.Services.AddScoped<EscalationService>();
+            builder.Services.AddScoped<MedicationReminderService>();
             builder.Services.AddScoped<AuditService>();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddScoped<AuditInterceptor>();
@@ -83,7 +83,38 @@ namespace smartFollowup.API
                     opt.QueueLimit = 0;
                 });
 
+                // Forgot Password — 3 طلبات كل 5 دقايق، لكل IP لوحده (منع سبام الإيميلات)
+                options.AddPolicy("forgot-password", httpContext =>
+                    System.Threading.RateLimiting.RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                        factory: _ => new System.Threading.RateLimiting.FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 3,
+                            Window = TimeSpan.FromMinutes(5),
+                            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                            QueueLimit = 0
+                        }));
+
+                // Verify OTP — أوسع لأنها بس تحقق، مش بتبعت إيميل، والمستخدم ممكن يغلط في الكود أكتر من مرة
+                options.AddPolicy("verify-otp", httpContext =>
+                    System.Threading.RateLimiting.RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                        factory: _ => new System.Threading.RateLimiting.FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 10,
+                            Window = TimeSpan.FromMinutes(5),
+                            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                            QueueLimit = 0
+                        }));
+
                 options.RejectionStatusCode = 429;
+                options.OnRejected = async (context, token) =>
+                {
+                    context.HttpContext.Response.ContentType = "application/json";
+                    await context.HttpContext.Response.WriteAsync(
+                        "{\"message\":\"Too many attempts. Please wait a few minutes before trying again.\"}",
+                        cancellationToken: token);
+                };
             });
 
             // Hangfire
@@ -91,14 +122,28 @@ namespace smartFollowup.API
                 builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddHangfireServer();
 
+            // تقليل محاولات إعادة المحاولة التلقائية من 10 (الافتراضي) لـ 3 بس، بفاصل زمني أوسع
+            // عشان منضربش SMTP بمحاولات كتيرة في وقت قصير لو فيه مشكلة مؤقتة
+            GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute
+            {
+                Attempts = 3,
+                DelaysInSeconds = new[] { 60, 300, 900 } // دقيقة، 5 دقايق، 15 دقيقة
+            });
+
             // CORS
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", policy =>
                 {
-                    policy.AllowAnyOrigin()
+                    // SignalR sends its negotiate request with credentials included, and per the
+                    // CORS spec the wildcard "*" origin cannot be combined with credentials — the
+                    // browser will block it. SetIsOriginAllowed(_ => true) still allows any origin,
+                    // but echoes back the actual requesting origin instead of "*", which satisfies
+                    // the spec and lets SignalR connect.
+                    policy.SetIsOriginAllowed(_ => true)
                           .AllowAnyMethod()
-                          .AllowAnyHeader();
+                          .AllowAnyHeader()
+                          .AllowCredentials();
                 });
             });
 
@@ -150,12 +195,13 @@ namespace smartFollowup.API
 
             var app = builder.Build();
 
-        
+            
                 app.UseSwagger();
                 app.UseSwaggerUI();
             
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
             app.UseCors("AllowAll");
             app.UseRateLimiter();
             app.UseAuthentication();
@@ -174,6 +220,11 @@ namespace smartFollowup.API
             RecurringJob.AddOrUpdate<EscalationService>(
                 "emergency-escalation",
                 x => x.CheckAndEscalateAsync(),
+                "*/30 * * * *");
+
+            RecurringJob.AddOrUpdate<MedicationReminderService>(
+                "medication-reminders",
+                x => x.SendDueRemindersAsync(),
                 "*/30 * * * *");
 
             app.Run();

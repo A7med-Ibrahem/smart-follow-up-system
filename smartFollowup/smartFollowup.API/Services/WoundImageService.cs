@@ -72,9 +72,38 @@ namespace SmartFollowUp.API.Services
             };
         }
 
-        // Get Images for Case (Timeline)
-        public async Task<List<WoundImageResponseDto>> GetCaseImagesAsync(long caseId)
+        // Delete Wound Image (patient can remove their own mistakenly-uploaded photo)
+        public async Task<bool> DeleteImageAsync(long imageId, long patientId)
         {
+            var image = await _context.WoundImages
+                .Include(w => w.DailyReport)
+                .FirstOrDefaultAsync(w => w.Id == imageId && w.DailyReport.PatientId == patientId);
+
+            if (image == null) return false;
+
+            // Remove the physical file too
+            var uploadsFolder = Path.Combine(_environment.WebRootPath ?? "wwwroot", "uploads");
+            var fileName = Path.GetFileName(image.ImageUrl);
+            var filePath = Path.Combine(uploadsFolder, fileName);
+            if (File.Exists(filePath))
+            {
+                try { File.Delete(filePath); } catch { /* non-fatal: DB record removal still proceeds */ }
+            }
+
+            _context.WoundImages.Remove(image);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        // Get Images for Case (Timeline) — ownership enforced: caller must be the case's doctor or its patient
+        public async Task<List<WoundImageResponseDto>?> GetCaseImagesAsync(long caseId, long requestingUserId)
+        {
+            var existingCase = await _context.Cases
+                .FirstOrDefaultAsync(c => c.Id == caseId &&
+                    (c.DoctorId == requestingUserId || c.PatientId == requestingUserId));
+
+            if (existingCase == null) return null;
+
             return await _context.WoundImages
                 .Where(w => w.CaseId == caseId)
                 .Select(w => new WoundImageResponseDto
