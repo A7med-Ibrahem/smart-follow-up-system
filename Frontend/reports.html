@@ -198,13 +198,6 @@ tr:hover td{background:rgba(37,99,235,0.015);transition:background .15s;cursor:p
 @media(max-width:480px){.stats-row{grid-template-columns:1fr;}.search-bar{display:none;}.filter-tabs{width:100%;}.filter-tab{flex:1;text-align:center;}}
 @keyframes spin{to{transform:rotate(360deg);}}
 </style>
-<link rel="manifest" href="/manifest.json"/>
-<meta name="theme-color" content="#2563EB"/>
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png"/>
-<meta name="mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
-<meta name="apple-mobile-web-app-title" content="SmartFollow"/>
 </head>
 <body>
 
@@ -358,7 +351,7 @@ tr:hover td{background:rgba(37,99,235,0.015);transition:background .15s;cursor:p
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-const API = 'http://localhost:5290/api';
+const API = 'https://followupsystem.runasp.net/api';
 let allReports = [];
 let filteredReports = [];
 let activeFilter = 'all';
@@ -720,13 +713,5 @@ function getInitials(n){return String(n||'').split(' ').filter(Boolean).slice(0,
 const AC=[{bg:'rgba(37,99,235,0.12)',text:'#2563EB'},{bg:'rgba(16,185,129,0.12)',text:'#10B981'},{bg:'rgba(245,158,11,0.12)',text:'#F59E0B'},{bg:'rgba(239,68,68,0.12)',text:'#EF4444'},{bg:'rgba(139,92,246,0.12)',text:'#8B5CF6'}];
 function avatarColor(n){let h=0;for(const c of String(n||''))h=(h*31+c.charCodeAt(0))&0xffffffff;return AC[Math.abs(h)%AC.length];}
 </script>
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-  });
-}
-</script>
 </body>
-
 </html>

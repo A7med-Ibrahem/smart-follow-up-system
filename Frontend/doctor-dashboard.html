@@ -1270,13 +1270,6 @@
     }
   </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
-<link rel="manifest" href="/manifest.json"/>
-<meta name="theme-color" content="#2563EB"/>
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png"/>
-<meta name="mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
-<meta name="apple-mobile-web-app-title" content="SmartFollow"/>
 </head>
 
 <body>
@@ -1688,7 +1681,7 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <script>
-    const API = 'http://localhost:5290/api';
+    const API = 'https://followupsystem.runasp.net/api';
     let currentPage = 1;
     let pageSize = 10;
     let totalPages = 1;
@@ -2313,14 +2306,6 @@
     style.textContent = `@keyframes spin{to{transform:rotate(360deg);}}`;
     document.head.appendChild(style);
   </script>
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-  });
-}
-</script>
 </body>
-
 
 </html>
