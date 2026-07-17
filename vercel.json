@@ -1,7 +1,0 @@
-{
-  "cleanUrls": true,
-  "rewrites": [
-    { "source": "/", "destination": "/Frontend/login.html" },
-    { "source": "/(.*)", "destination": "/Frontend/$1" }
-  ]
-}
