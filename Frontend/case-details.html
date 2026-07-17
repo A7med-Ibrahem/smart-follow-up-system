@@ -1156,7 +1156,14 @@
         }
       }
     </style>
-  </head>
+  <link rel="manifest" href="/manifest.json"/>
+<meta name="theme-color" content="#2563EB"/>
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="SmartFollow"/>
+</head>
   <body>
     <div
       class="sidebar-overlay"
@@ -1859,7 +1866,7 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
-      const API = "https://followupsystem.runasp.net/api";
+      const API = "http://localhost:5290/api";
       const params = new URLSearchParams(location.search);
       const CASE_ID = params.get("id");
       let caseData = null;
@@ -2619,5 +2626,13 @@
       s.textContent = "@keyframes spin{to{transform:rotate(360deg);}}";
       document.head.appendChild(s);
     </script>
-  </body>
+  <script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+
 </html>
