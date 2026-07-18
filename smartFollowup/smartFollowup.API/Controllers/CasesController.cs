@@ -26,13 +26,18 @@ namespace SmartFollowUp.API.Controllers
             var doctorId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             var doctorName = User.FindFirst(ClaimTypes.Name)?.Value ?? "Doctor";
 
-            var result = await _caseService.CreateCaseAsync(request, doctorId);
-            if (result == null)
-                return BadRequest(new { message = "Failed to create case" });
+            try
+            {
+                var result = await _caseService.CreateCaseAsync(request, doctorId);
+                if (result == null)
+                    return BadRequest(new { message = "Failed to create case" });
 
-            
-
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         // GET api/cases?page=1&pageSize=10

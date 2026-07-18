@@ -2,7 +2,7 @@
 <html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <title>SmartFollow Up | Sign In</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -38,6 +38,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg-main);color:var(--text-m
 .left-top{position:relative;z-index:1;}
 .left-logo{display:flex;align-items:center;gap:10px;color:#fff;font-weight:700;font-size:22px;margin-bottom:72px;}
 .left-logo svg{width:28px;height:28px;}
+.mobile-logo{display:none;align-items:center;gap:8px;color:var(--primary);font-weight:700;font-size:19px;margin-bottom:24px;}
+.mobile-logo svg{width:24px;height:24px;}
 .left-headline h1{color:#fff;font-size:36px;font-weight:700;line-height:1.25;margin-bottom:14px;}
 .left-headline p{color:rgba(255,255,255,0.72);font-size:15px;line-height:1.65;max-width:360px;}
 .feature-list{position:relative;z-index:1;display:flex;flex-direction:column;gap:14px;}
@@ -120,9 +122,16 @@ body{font-family:'Inter',sans-serif;background:var(--bg-main);color:var(--text-m
 .spinner{display:inline-block;animation:spin 0.7s linear infinite;}
 
 /* RESPONSIVE */
-@media(max-width:900px){.left-panel{display:none;}.right-panel{padding:40px 24px;}}
+@media(max-width:900px){.left-panel{display:none;}.right-panel{padding:40px 24px;}.mobile-logo{display:flex;}}
 @media(max-width:480px){.right-panel{padding:28px 16px;}.role-tab{font-size:12px;}.otp-input{width:42px;height:48px;font-size:18px;}.otp-inputs{gap:6px;}}
 </style>
+<link rel="manifest" href="/manifest.json"/>
+<meta name="theme-color" content="#2563EB"/>
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="SmartFollow"/>
 </head>
 <body>
 
@@ -163,6 +172,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg-main);color:var(--text-m
 
 <!-- RIGHT PANEL -->
 <div class="right-panel">
+  <div class="mobile-logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+    SmartFollow
+  </div>
   <div class="theme-toggle-wrap">
     <button class="theme-toggle" id="themeToggle">
       <svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
@@ -349,11 +362,11 @@ window.addEventListener('DOMContentLoaded', () => {
   const role = localStorage.getItem('userRole');
   if (token && role) {
       const map = {
-          Doctor: 'doctor-dashboard.html',
-          Patient: 'patient-dashboard.html',
-          Admin: 'admin-dashboard.html'
+          Doctor: '/doctor-dashboard.html',
+          Patient: '/patient-dashboard.html',
+          Admin: '/admin-dashboard.html'
       };
-      window.location.href = map[role] || 'login.html';
+      window.location.href = map[role] || '/login.html';
       return;
   }
   initTheme();
@@ -439,8 +452,8 @@ async function doLogin() {
 }
 
 function redirect(r) {
-  const map = { Doctor:'doctor-dashboard.html', Patient:'patient-dashboard.html', Admin:'admin-dashboard.html' };
-  window.location.href = map[r] || 'doctor-dashboard.html';
+  const map = { Doctor:'/doctor-dashboard.html', Patient:'/patient-dashboard.html', Admin:'/admin-dashboard.html' };
+  window.location.href = map[r] || '/doctor-dashboard.html';
 }
 
 function parseRole(token) {
@@ -641,5 +654,13 @@ function btnLoading(id, loading, text) {
   }
 }
 </script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+</script>
 </body>
+
 </html>

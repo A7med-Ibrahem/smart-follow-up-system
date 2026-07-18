@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>SmartFollow Up | Doctor Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -51,6 +51,7 @@
       color: var(--text-main);
       display: flex;
       height: 100vh;
+      height: 100dvh;
       overflow: hidden;
       transition: background-color var(--transition), color var(--transition);
     }
@@ -1203,6 +1204,7 @@
 
       .content {
         padding: 20px 16px;
+        padding-bottom: calc(20px + env(safe-area-inset-bottom) + 24px);
       }
 
       .stats-grid {
@@ -1270,6 +1272,13 @@
     }
   </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+<link rel="manifest" href="/manifest.json"/>
+<meta name="theme-color" content="#2563EB"/>
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="SmartFollow"/>
 </head>
 
 <body>
@@ -1286,7 +1295,7 @@
       <span>SmartFollow</span>
     </a>
     <nav class="nav-group">
-      <a href="doctor-dashboard.html" class="nav-link active" data-page="dashboard">
+      <a href="doctor-dashboard.html" class="nav-link active" data-page="dashboard" onclick="return goToDashboardSection(event, this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="3" y="3" width="7" height="7" rx="1" />
           <rect x="14" y="3" width="7" height="7" rx="1" />
@@ -1295,7 +1304,7 @@
         </svg>
         <span>Dashboard</span>
       </a>
-      <a href="doctor-dashboard.html" class="nav-link" data-page="cases">
+      <a href="doctor-dashboard.html" class="nav-link" data-page="cases" onclick="return goToCasesSection(event, this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
           <circle cx="9" cy="7" r="4" />
@@ -1471,7 +1480,7 @@
       </div>
 
       <!-- TABLE -->
-      <div class="section-header">
+      <div class="section-header" id="patientCasesSection">
         <span class="section-title">Patient Cases</span>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
           <div class="filter-tabs">
@@ -1761,8 +1770,16 @@
         if (n.type === 'Alert') loadAlertCount();
       });
 
+      // withAutomaticReconnect() gives up after a few tries; if that happens
+      // (e.g. the host briefly drops the connection), retry from scratch after
+      // a short delay instead of leaving live notifications dead until reload.
+      hubConnection.onclose(() => {
+        setTimeout(connectNotificationHub, 5000);
+      });
+
       hubConnection.start().catch(() => {
         // Live updates unavailable; the notification panel still works via polling on next load/interaction.
+        setTimeout(connectNotificationHub, 5000);
       });
     }
 
@@ -2015,7 +2032,7 @@
     });
 
     document.querySelectorAll('.modal-overlay').forEach(m => {
-      m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+      m.addEventListener('click', e => { if (e.target === m && m.dataset.forced !== '1') m.classList.remove('open'); });
     });
 
     function clearFormErrors() {
@@ -2184,6 +2201,30 @@
       document.getElementById('sidebarOverlay').classList.remove('open');
     }
 
+    // ── DASHBOARD / ALL CASES NAV ──
+    // "Dashboard" and "All Cases" are both sections of this same page (stats
+    // on top, cases table below). Instead of reloading the page (which always
+    // lands back at the top / dashboard view, making "All Cases" look broken),
+    // scroll to the right section in place and keep the active nav state in sync.
+    function setActiveNavLink(linkEl) {
+      document.querySelectorAll('.nav-link[data-page]').forEach(l => l.classList.remove('active'));
+      linkEl.classList.add('active');
+    }
+    function goToDashboardSection(e, linkEl) {
+      e.preventDefault();
+      setActiveNavLink(linkEl);
+      document.querySelector('.content').scrollTo({ top: 0, behavior: 'smooth' });
+      closeSidebar();
+      return false;
+    }
+    function goToCasesSection(e, linkEl) {
+      e.preventDefault();
+      setActiveNavLink(linkEl);
+      document.getElementById('patientCasesSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      closeSidebar();
+      return false;
+    }
+
     // ── TOAST ──
     function showToast(message, type = 'success') {
       const container = document.getElementById('toastContainer');
@@ -2306,6 +2347,14 @@
     style.textContent = `@keyframes spin{to{transform:rotate(360deg);}}`;
     document.head.appendChild(style);
   </script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+</script>
 </body>
+
 
 </html>

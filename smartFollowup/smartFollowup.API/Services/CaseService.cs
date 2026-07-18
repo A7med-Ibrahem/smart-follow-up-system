@@ -31,7 +31,19 @@ namespace SmartFollowUp.API.Services
                 var isNewPatient = false;
 
                 var patient = await _context.Users
-                    .FirstOrDefaultAsync(u => u.Email == request.PatientEmail);
+                    .FirstOrDefaultAsync(u => u.Email == request.PatientEmail && u.Role == UserRole.Patient);
+
+                if (patient == null)
+                {
+                    var conflictingUser = await _context.Users
+                        .FirstOrDefaultAsync(u => u.Email == request.PatientEmail);
+
+                    if (conflictingUser != null)
+                    {
+                        throw new InvalidOperationException(
+                            $"This email is already registered as a {conflictingUser.Role} account and cannot be used for a patient.");
+                    }
+                }
 
                 if (patient == null)
                 {
